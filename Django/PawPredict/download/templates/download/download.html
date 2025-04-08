@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'download/download-style.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'download/images/PawPredict-iconlogo.png' %}">
+    <title>Paw Predict || Download</title>
+    
+
+</head>
+<body>
+    <header>
+        <img src="{% static 'download/images/PawPredict-logo.png' %}" alt="PawPredictLogo">
+    </header>
+
+    <main>
+        <h2>Download Now</h2>
+        <p class="muted">Easily predict potential dog diseases based on observable symptoms with Paw Predict. This smart and intuitive app helps pet owners assess their dog's health and provides guidance on possible conditions.</p>
+        
+        <div>
+            <p><strong>Version: </strong>v1.0.0 (2-27-2025)</p>
+            <p><strong>File Size: </strong>{{ file_size }} MB</p>
+            <p><strong>Downloads: </strong>{{ total_downloads }}</p>
+            <button id="downloadButton">Download APK</button>
+        </div>
+
+        <p class="note"><small><strong>Note:</strong> You may need to enable "Install from Unknown Sources" in your device settings.</small></p>
+    </main>
+
+    <section>
+        <h3>Why Use Paw Predict?</h3>
+        <ul class="list-group">
+            <li class="list-group-item">✔ Fast & Easy: Enter symptoms and get predictions instantly.</li>
+            <li class="list-group-item">✔ Reliable Data: Based on verified veterinary sources.</li>
+            <li class="list-group-item">✔ First Aid Guidance: Provides step-by-step first aid instructions.</li>
+            <li class="list-group-item">✔ Find Nearby Vets: Built-in map to locate veterinary clinics.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>Need Help?</h3>
+        <p>Email: <a href="mailto:support@pawpredict.com">support@pawpredict.com</a></p>
+    </section>
+
+    <footer>
+        <img src="{% static 'download/images/PawPredict-minimal-logo.png' %}" alt="PawPredictLogo">
+        <p>&copy; SCAS-BSCS-2025</p>
+    </footer>
+
+    <script>
+        document.getElementById("downloadButton").addEventListener("click", function() {
+            window.location.href = "{% url 'download-apk' %}";
+            setTimeout(function() {
+                window.location.href = "{% url 'thank-you' %}";
+            }, 10000);
+        });
+    </script>
+
+</body>
+</html>
+

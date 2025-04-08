@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'download/index-style.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'download/images/PawPredict-iconlogo.png' %}">
+    <title>Paw Predict</title>
+    
+
+</head>
+<body>
+    <div class="logo">
+        <img src="{% static 'download/images/PawPredict-logo.png' %}" alt="PawPredictLogo">
+    </div>
+    <section>
+        <button id="goToDownloadPage">
+            Start Now!!
+        </button>
+    </section>
+
+    <script>
+        document.getElementById("goToDownloadPage").addEventListener("click", function() {
+            window.location.href = "{% url 'download' %}";
+        });
+    </script>
+
+</body>
+</html>
+

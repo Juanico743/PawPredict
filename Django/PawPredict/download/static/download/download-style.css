@@ -1,0 +1,140 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #1DCFC1, #9EFFF8);
+}
+
+/* Header */
+header {
+    display: flex;
+    padding: 10px;
+    justify-content: center;
+    background-color: #FFFFFF;
+    border-bottom-left-radius: 50% 50px;
+    border-bottom-right-radius: 50% 50px;
+    box-shadow: 0px 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+
+header img {
+    height: 200px;
+    width: auto;
+}
+
+/* Main Content */
+main {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #FFFFFF;
+    box-shadow: 0px 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+main h2 {
+    line-height: 1;
+}
+
+main p {
+    text-align: center;
+}
+
+.muted {
+    color: #6c757d;
+}
+
+.note {
+    color: #eb345f;
+    font-style: italic;
+}
+
+main div {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0px;
+}
+
+
+main div p {
+    margin: 0; 
+    padding: 0;
+    line-height: 2;
+    align-self: start;
+}
+
+
+/* Download Button */
+main button {
+    all: unset;
+    display: inline-block;
+    padding: 12px 0px;
+    margin-top: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 100px;
+    transition: 0.3s;
+    box-shadow: 0px 2px 2px 2px rgba(0, 0, 0, 0.2);
+
+    background-color: #1DCFC1;
+    color: white;
+    text-align: center;
+}
+
+
+/* Section */
+
+section {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    box-shadow: 0px 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+ul.list-group {
+    padding-left: 0;
+}
+
+.list-group-item {
+    list-style: none;
+    padding: 10px;
+    background-color: white;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Footer */
+footer {
+    
+    text-align: center;
+}
+
+footer p {
+    color: #1F1F1F;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0%;
+    padding: 0%;
+}
+
+footer img {
+    height: 150px;
+}
+
+
+
+@media (max-width: 750px) {
+
+    main, section{
+        margin: 20px 15px;
+    }
+
+}
+
+
+
