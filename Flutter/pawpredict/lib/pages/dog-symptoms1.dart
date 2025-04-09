@@ -25,14 +25,14 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
 
 
   String? selectSymptoms;
-  List<String> dogSymptomsList = [];
+  List<Map<String, dynamic>>dogSymptomsList = [];
   List<String> selectedDogSymptomsList = [];
 
   List<int> finalLineUp = [];
 
 
   TextEditingController _searchController = TextEditingController();
-  List<String> filteredSymptoms = [];
+  List<Map<String, dynamic>> filteredSymptoms = [];
 
 
   @override
@@ -52,20 +52,28 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
       currentPageTitle = 'Dog Symptoms';
 
       filteredSymptoms = List.from(dogSymptomsList);
+
     });
+
 
   }
 
 
   void _filterSymptoms(String query) {
     setState(() {
-      if (query.isEmpty) {
+      if (query.isEmpty && selectedValue == 'All') {
         filteredSymptoms = List.from(dogSymptomsList);
       } else {
-        filteredSymptoms = dogSymptomsList
-            .where((symptom) =>
-            symptom.toLowerCase().contains(query.toLowerCase()))
-            .toList();
+        filteredSymptoms = dogSymptomsList.where((symptom) {
+          final name = symptom['name']?.toString().toLowerCase() ?? '';
+          final isCommon = symptom['common'] ?? false;
+
+          if (selectedValue == 'Common') {
+            return name.contains(query.toLowerCase()) && isCommon;
+          } else {
+            return name.contains(query.toLowerCase());
+          }
+        }).toList();
       }
     });
   }
@@ -74,14 +82,20 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
   Future<void> loadSymptomsList() async {
     try {
       String uri = '$serverUri/api/getsymptoms/';
-      var res = await http.get(Uri.parse(uri), headers: {"Content-Type": "application/json"});
+      var res = await http.get(
+          Uri.parse(uri),
+          headers: {"Content-Type": "application/json"}
+      );
+
       var response = jsonDecode(res.body);
+      //print(response);
 
       if (response["success"] == true) {
         setState(() {
-          dogSymptomsList = List<String>.from(response["symptoms"]);
+          dogSymptomsList = List<Map<String, dynamic>>.from(response["symptoms"]);
           filteredSymptoms = List.from(dogSymptomsList);
         });
+        _filterSymptoms("");
       }
     } catch (e) {
       print("Error fetching symptoms: $e");
@@ -246,6 +260,7 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
                         setState(() {
                           selectedValue = newValue!;
                         });
+                        _filterSymptoms(_searchController.text);
                       },
                       decoration: InputDecoration(
                         fillColor: Color(0xFFDBF7FF),
@@ -296,61 +311,62 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
           const SizedBox(height: 10),
 
 
-          Flexible( // or use Expanded depending on context
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(5.0),
-              decoration: BoxDecoration(
-                color: const Color(0xFFDBF7FF),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: SingleChildScrollView(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  children: filteredSymptoms.map((symptom) {
-                    final isSelected = selectedDogSymptomsList.contains(symptom);
-                    return Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (isSelected) {
-                              selectedDogSymptomsList.remove(symptom);
-                            } else {
-                              selectedDogSymptomsList.add(symptom);
-                            }
-                            print(selectedDogSymptomsList);
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                          decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFF1DCFC1) : const Color(0xFF4A6FD7),
-                            borderRadius: BorderRadius.circular(5.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 1,
-                                offset: const Offset(0, 1),
+              Flexible( // or use Expanded depending on context
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(5.0),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDBF7FF),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      children: filteredSymptoms.map((symptom) {
+                        final symptomName = symptom['name'] ?? ''; // Extract the name
+                        final isSelected = selectedDogSymptomsList.contains(symptomName);
+                        return Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (isSelected) {
+                                  selectedDogSymptomsList.remove(symptomName);
+                                } else {
+                                  selectedDogSymptomsList.add(symptomName);
+                                }
+                                print(selectedDogSymptomsList);
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                              decoration: BoxDecoration(
+                                color: isSelected ? const Color(0xFF1DCFC1) : const Color(0xFF4A6FD7),
+                                borderRadius: BorderRadius.circular(5.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 1,
+                                    offset: const Offset(0, 1),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: Text(
-                            symptom,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                              child: Text(
+                                symptomName, // Display the name
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
 
 
           if (selectSymptoms == null && selectedDogSymptomsList.isEmpty)

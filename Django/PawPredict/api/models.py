@@ -38,6 +38,7 @@ class DogSymptoms(models.Model):
     name = models.CharField(max_length=255)
     question = models.TextField()
     question_description = models.TextField()
+    common = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

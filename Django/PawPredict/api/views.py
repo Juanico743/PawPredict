@@ -37,21 +37,21 @@ myerror = ""
 
 try:
     model = LogisticRegression()
-    data = pd.read_csv("PawPredictDataset.csv") 
+    data = pd.read_csv("PawPredictDataset.csv")  # Assumes a header row
     X = data.drop("Disease", axis=1)
     y = data["Disease"]
-
-    X = X.fillna(0)
+    X = X.fillna(0) # Fill NaN before checking
 
     if X.isnull().any().any():
         raise ValueError(f"NaN values still found in the feature set (X).")
-    
+
     if y.isnull().any():
         raise ValueError("NaN values found in the target variable (y).")
 
     model.fit(X, y)
-
-    accuracy = model.score(X, y) * 100  
+    #Get Feature names from trained model
+    feature_names = X.columns 
+    accuracy = model.score(X, y) * 100
 
 except FileNotFoundError:
     model = None
@@ -60,11 +60,12 @@ except FileNotFoundError:
 except ValueError as ve:
     model = None
     X = None
-    myerror = f"Data issue: {ve}"  
+    myerror = f"Data issue: {ve}"
 except Exception as e:
     model = None
     X = None
-    myerror = f"error loading: {e}"  
+    myerror = f"error loading: {e}"
+
 
 class PredictDisease(APIView):
     def post(self, request):
@@ -78,12 +79,13 @@ class PredictDisease(APIView):
             if len(symptom_values) != len(X.columns):
                 return JsonResponse({"error": f"Incorrect number of symptom values. symptoms:{len(symptom_values)} != columns: {len(X.columns)}"}, status=400)
 
-            input_array = np.array([symptom_values])
 
-            if np.any(np.isnan(input_array)):
+            input_df = pd.DataFrame([symptom_values], columns=feature_names)
+
+            if input_df.isnull().any().any():
                 return JsonResponse({"error": "NaN values found in input data."}, status=400)
 
-            prediction = model.predict(input_array)[0]
+            prediction = model.predict(input_df)[0]
 
             return JsonResponse({
                 "prediction": prediction,
@@ -170,7 +172,15 @@ class CleanInsertDataset(APIView):
             cursor.execute("ALTER TABLE api_dogdiseasefirstaid AUTO_INCREMENT = 1;")
 
 
-        symptoms = [DogSymptoms(name=name, question=question, question_description=description) for name, question, description in dog_symptoms]
+        symptoms = [
+            DogSymptoms(
+                name=name,
+                question=question,
+                question_description=description,
+                common=common
+            )
+            for name, question, description, common in dog_symptoms
+        ]
         DogSymptoms.objects.bulk_create(symptoms)
 
         symptoms_map = {symptom.id: symptom for symptom in DogSymptoms.objects.all()}
@@ -278,8 +288,8 @@ class GetQuestion(APIView):
 
 class GetSymptoms(APIView):
     def get(self, request):
-        symptoms = DogSymptoms.objects.values_list("name", flat=True)
-        return Response({"success": True, "symptoms": list(symptoms)}) 
+        symptoms = DogSymptoms.objects.values("name", "common")
+        return Response({"success": True, "symptoms": list(symptoms)})
         
 
 class GetQuestionLineUp(APIView):
