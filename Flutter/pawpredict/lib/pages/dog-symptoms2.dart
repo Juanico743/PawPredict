@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
-
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart' as lottie;
@@ -8,6 +8,7 @@ import 'package:pawpredict/services/global.dart';
 import 'package:pawpredict/utils/appbar.dart';
 import 'package:pawpredict/utils/navbar.dart';
 import 'package:http/http.dart' as http;
+
 
 class DogSymptoms2 extends StatefulWidget {
   const DogSymptoms2({super.key});
@@ -43,6 +44,8 @@ class _DogSymptoms2State extends State<DogSymptoms2> {
     });
   }
 
+
+
   Future<void> loadQuestion(int questionId, int symptomsId) async {
     Map<String, dynamic> questionTemp = {};
     try {
@@ -53,7 +56,7 @@ class _DogSymptoms2State extends State<DogSymptoms2> {
         body: jsonEncode({"nextQuestion": symptomsId}),
       );
 
-      var response = jsonDecode(res.body);
+      var response = json.decode(utf8.decode(res.bodyBytes));
       //print(res.body);
       if (response["success"] == true) {
         questionTemp['id'] = symptomsId;
@@ -115,7 +118,7 @@ class _DogSymptoms2State extends State<DogSymptoms2> {
 
   Future<void> getAllYes() async {
     allYes = [];
-    resetDataset();
+    finalDatasetAnswer = datasetCopy;
 
     allYes = questionsCollected.entries
         .where((entry) => entry.value['answer'] == 1)
@@ -130,6 +133,8 @@ class _DogSymptoms2State extends State<DogSymptoms2> {
     for (int id in finalSelection) {
       finalDatasetAnswer[id - 1] = 1;
     }
+
+    print(finalDatasetAnswer);
   }
 
 

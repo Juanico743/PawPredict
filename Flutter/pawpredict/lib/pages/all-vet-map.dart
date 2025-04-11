@@ -212,11 +212,11 @@ class _AllVetClinicState extends State<AllVetClinic> {
           double distance = Geolocator.distanceBetween(
               lastUserPosition!.latitude, lastUserPosition!.longitude,
               newPosition.latitude, newPosition.longitude);
-          if (distance >= 100) {
+          if (distance >= 1) {
             if (mounted) {
               setState(() {
                 currentUserPosition = newPosition;
-                _cameraToPosition(currentUserPosition!);
+                //_cameraToPosition(currentUserPosition!);
               });
             }
             if (!_routeFetched) {
@@ -231,7 +231,7 @@ class _AllVetClinicState extends State<AllVetClinic> {
           if (mounted) {
             setState(() {
               currentUserPosition = newPosition;
-              _cameraToPosition(currentUserPosition!);
+              //_cameraToPosition(currentUserPosition!);
             });
           }
           if (!_routeFetched) {

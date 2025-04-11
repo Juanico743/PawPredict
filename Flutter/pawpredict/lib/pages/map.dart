@@ -279,6 +279,8 @@ class _VetMapState extends State<VetMap> {
               child: Column(
                 children: [
                   SizedBox(height: 30),
+
+                  if (singleVetAvailability.isNotEmpty || singleVetRegularHours.isNotEmpty || singleVetEmergencyHours.isNotEmpty)
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     child: Container(
@@ -297,83 +299,89 @@ class _VetMapState extends State<VetMap> {
                       ),
                       child: Column(
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                height: 30.0,
-                                width: 30.0,
-                                margin: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10.0),
+                          if (singleVetAvailability.isNotEmpty)
+                            Row(
+                              children: [
+                                Container(
+                                  height: 30.0,
+                                  width: 30.0,
+                                  margin: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  child: Image.asset(
+                                    'assets/images/icons/calendar-p.png',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                                child: Image.asset(
-                                  'assets/images/icons/calendar-p.png',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 5),
-                                  child: Text(
-                                    singleVetAvailability,
-                                    style: TextStyle(
-                                      color: Color(0xFF4A6FD7),
-                                      fontFamily: 'Lexend',
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 14.0,
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(horizontal: 5),
+                                    child: Text(
+                                      singleVetAvailability,
+                                      style: TextStyle(
+                                        color: Color(0xFF4A6FD7),
+                                        fontFamily: 'Lexend',
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14.0,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                'Open Hours:',
-                                style: TextStyle(
-                                  color: Color(0xFF091F5C),
-                                  fontFamily:'Lexend',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14.0,
+                              ],
+                            ),
+
+                          if (singleVetRegularHours.isNotEmpty)
+                            Row(
+                              children: [
+                                Text(
+                                  'Open Hours:',
+                                  style: TextStyle(
+                                    color: Color(0xFF091F5C),
+                                    fontFamily:'Lexend',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14.0,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 5.0),
-                              Text(
-                                singleVetRegularHours,
-                                style: TextStyle(
-                                  color: Color(0xFF4A6FD7),
-                                  fontFamily:'Lexend',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14.0,
+                                SizedBox(width: 5.0),
+                                Text(
+                                  singleVetRegularHours,
+                                  style: TextStyle(
+                                    color: Color(0xFF4A6FD7),
+                                    fontFamily:'Lexend',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14.0,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 5.0),
-                          Row(
-                            children: [
-                              Text(
-                                'Emergency Hours:',
-                                style: TextStyle(
-                                  color: Color(0xFF091F5C),
-                                  fontFamily:'Lexend',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14.0,
+                              ],
+                            ),
+
+                          if (singleVetEmergencyHours.isNotEmpty)
+                            SizedBox(height: 5.0),
+                          if (singleVetEmergencyHours.isNotEmpty)
+                            Row(
+                              children: [
+                                Text(
+                                  'Emergency Hours:',
+                                  style: TextStyle(
+                                    color: Color(0xFF091F5C),
+                                    fontFamily:'Lexend',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14.0,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 5.0),
-                              Text(
-                                singleVetEmergencyHours,
-                                style: TextStyle(
-                                  color: Color(0xFF4A6FD7),
-                                  fontFamily:'Lexend',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14.0,
+                                SizedBox(width: 5.0),
+                                Text(
+                                  singleVetEmergencyHours,
+                                  style: TextStyle(
+                                    color: Color(0xFF4A6FD7),
+                                    fontFamily:'Lexend',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14.0,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
                         ],
                       ),
                     ),

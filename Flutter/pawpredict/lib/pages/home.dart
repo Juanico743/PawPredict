@@ -871,96 +871,100 @@ class _HomeState extends State<Home> {
                         ),
                       ),
 
-
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 30),
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 30.0,
-                              width: 30.0,
-                              margin: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
+                      if (weekDays.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 30),
+                          child: Row(
+                            children: [
+                              Container(
+                                height: 30.0,
+                                width: 30.0,
+                                margin: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Image.asset(
+                                  'assets/images/icons/calendar-p.png',
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                              child: Image.asset(
-                                'assets/images/icons/calendar-p.png',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 5),
-                                child: Text(
-                                  weekDays,
-                                  style: TextStyle(
-                                    color: Color(0xFF4A6FD7),
-                                    fontFamily: 'Lexend',
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 14.0,
+                              Expanded(
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(horizontal: 5),
+                                  child: Text(
+                                    weekDays,
+                                    style: TextStyle(
+                                      color: Color(0xFF4A6FD7),
+                                      fontFamily: 'Lexend',
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14.0,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        margin: EdgeInsets.symmetric(horizontal: 30),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Open Hours:',
-                              style: TextStyle(
-                                color: Color(0xFF091F5C),
-                                fontFamily:'Lexend',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                            SizedBox(width: 5.0),
-                            Text(
-                              regularTime,
-                              style: TextStyle(
-                                color: Color(0xFF4A6FD7),
-                                fontFamily:'Lexend',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14.0,
-                              ),
-                            ),
 
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 5.0),
-                      Container(
-                        width: double.infinity,
-                        margin: EdgeInsets.symmetric(horizontal: 30),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Emergency Hours:',
-                              style: TextStyle(
-                                color: Color(0xFF091F5C),
-                                fontFamily:'Lexend',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14.0,
+                      if (regularTime.isNotEmpty)
+                        Container(
+                          width: double.infinity,
+                          margin: EdgeInsets.symmetric(horizontal: 30),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Open Hours:',
+                                style: TextStyle(
+                                  color: Color(0xFF091F5C),
+                                  fontFamily:'Lexend',
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 14.0,
+                                ),
                               ),
-                            ),
-                            SizedBox(width: 5.0),
-                            Text(
-                              emergencyTime,
-                              style: TextStyle(
-                                color: Color(0xFF4A6FD7),
-                                fontFamily:'Lexend',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14.0,
+                              SizedBox(width: 5.0),
+                              Text(
+                                regularTime,
+                                style: TextStyle(
+                                  color: Color(0xFF4A6FD7),
+                                  fontFamily:'Lexend',
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 14.0,
+                                ),
                               ),
-                            ),
-                          ],
+
+                            ],
+                          ),
                         ),
-                      ),
+                      if (emergencyTime.isNotEmpty)
+                        SizedBox(height: 5.0),
+                      if (emergencyTime.isNotEmpty)
+                        Container(
+                          width: double.infinity,
+                          margin: EdgeInsets.symmetric(horizontal: 30),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Emergency Hours:',
+                                style: TextStyle(
+                                  color: Color(0xFF091F5C),
+                                  fontFamily:'Lexend',
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 14.0,
+                                ),
+                              ),
+                              SizedBox(width: 5.0),
+                              Text(
+                                emergencyTime,
+                                style: TextStyle(
+                                  color: Color(0xFF4A6FD7),
+                                  fontFamily:'Lexend',
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 14.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
 
                       SizedBox(height: 30.0),
 

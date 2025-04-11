@@ -55,7 +55,7 @@ class _FindingsState extends State<Findings> {
       );
 
       var response = jsonDecode(res.body);
-      print(res.body);
+      //print(res.body);
 
       if (response["success"] == true) {
         setState(() {
@@ -83,8 +83,8 @@ class _FindingsState extends State<Findings> {
         }),
       );
 
-      var response = jsonDecode(res.body);
-      print(res.body);
+      var response = json.decode(utf8.decode(res.bodyBytes));
+      //print(res.body);
 
       if (response["success"] == true) {
         setState(() {
@@ -255,7 +255,7 @@ class _FindingsState extends State<Findings> {
                             ),
                           ),
                           SizedBox(height: 10),
-                          titleText(text: 'is the condition affecting your dog health.'),
+                          titleText(text: "Is the condition affecting ${theDogsName.isNotEmpty ? theDogsName : "your dog"}'s health?"),
 
                           SizedBox(height: 10),
 

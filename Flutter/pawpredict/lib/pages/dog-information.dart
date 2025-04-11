@@ -15,6 +15,7 @@ class DogInformation extends StatefulWidget {
 class _DogInformationState extends State<DogInformation> {
 
   // TextEditingController _dogAge = TextEditingController();
+  TextEditingController _dogName = TextEditingController();
   double currentValue = 1.0;
 
   String? selectedBreed;
@@ -50,6 +51,40 @@ class _DogInformationState extends State<DogInformation> {
   //     });
   //   }
   // }
+
+  void _dogInformationValue() {
+    resetDataset();
+
+    if (selectedBreed == 'Shih Tzu') {
+      finalDatasetAnswer[finalDatasetAnswer.length - 8] = 1;
+    } else if (selectedBreed == 'Pomeranian') {
+      finalDatasetAnswer[finalDatasetAnswer.length - 7] = 1;
+    } else if (selectedBreed == 'Aspin') {
+      finalDatasetAnswer[finalDatasetAnswer.length - 6] = 1;
+    }
+
+
+    if (_selectedGender == 1) {
+      finalDatasetAnswer[finalDatasetAnswer.length - 5] = 1;
+    } else if (_selectedGender == 2) {
+      finalDatasetAnswer[finalDatasetAnswer.length - 4] = 1;
+    }
+
+
+    if (selectedAge == 'Puppy (Below 2 years old)') {
+      finalDatasetAnswer[finalDatasetAnswer.length - 3] = 1;
+    } else if (selectedAge == 'Adult (2-7 years old)') {
+      finalDatasetAnswer[finalDatasetAnswer.length - 2] = 1;
+    } else if (selectedAge == 'Senior (8+ years old)') {
+      finalDatasetAnswer[finalDatasetAnswer.length - 1] = 1;
+    }
+
+    datasetCopy = finalDatasetAnswer;
+
+    //print(finalDatasetAnswer);
+    Navigator.pushNamed(context, '/dog-symptoms1');
+
+  }
 
   @override
   void initState() {
@@ -151,8 +186,9 @@ class _DogInformationState extends State<DogInformation> {
                             SizedBox(height: 5.0),
 
                             buildTextField(
-                                hintText: '(Optional) Ex. Bantatay',
-                                onChanged: (value) {  }
+                              hintText: '(Optional) Ex. Bantatay',
+                              onChanged: (value) {  },
+                              controller: _dogName,
                             ),
                           ],
                         ),
@@ -347,7 +383,8 @@ class _DogInformationState extends State<DogInformation> {
                                 SizedBox(height: 50),
                                 GestureDetector(
                                   onTap: (){
-                                    Navigator.pushNamed(context, '/dog-symptoms1');
+
+                                    _dogInformationValue();
                                   },
                                   child: Container(
                                     width: 100,
@@ -417,23 +454,46 @@ class _DogInformationState extends State<DogInformation> {
 
   Widget buildTextField({
     required String hintText,
-    TextEditingController? controller,
+    required TextEditingController controller,
     required ValueChanged<String> onChanged,
   }) {
     return TextField(
-      onChanged: onChanged,
+      onChanged: (value) {
+        final oldText = controller.text;
+        final oldSelection = controller.selection;
+
+        String formattedValue = value.isNotEmpty
+            ? value[0].toUpperCase() + value.substring(1).toLowerCase()
+            : '';
+
+        if (formattedValue != oldText) {
+          int newOffset = oldSelection.baseOffset;
+          if (newOffset > formattedValue.length) {
+            newOffset = formattedValue.length;
+          }
+
+          controller.value = TextEditingValue(
+            text: formattedValue,
+            selection: TextSelection.collapsed(offset: newOffset),
+          );
+        }
+
+        onChanged(formattedValue);
+        theDogsName = formattedValue;
+      },
       controller: controller,
       style: TextStyle(
         color: Color(0xFF1E1E1E),
-        fontFamily:'Lexend',
+        fontFamily: 'Lexend',
         fontWeight: FontWeight.w400,
         fontSize: 15.0,
       ),
+      textCapitalization: TextCapitalization.words,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
           color: Color(0x881E1E1E),
-          fontFamily:'Lexend',
+          fontFamily: 'Lexend',
           fontWeight: FontWeight.w400,
           fontSize: 15.0,
         ),
@@ -458,6 +518,9 @@ class _DogInformationState extends State<DogInformation> {
           ),
         ),
       ),
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp('[a-zA-Z ]')),
+      ],
     );
   }
 

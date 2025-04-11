@@ -1,6 +1,6 @@
 library globals;
 
-String serverUri = "http://192.168.1.7:8000";
+String serverUri = "http://192.168.87.133:8000";
 const String googleMapAPI = "AIzaSyC4O5JIbDyCnarQiUc0eQmhbQwel186NHw";
 
 String? currentPage = '';
@@ -16,13 +16,15 @@ String singleVetAvailability = '';
 String singleVetRegularHours = '';
 String singleVetEmergencyHours = '';
 
-
 List<int> lineupQuestion = [];
 List<int> finalSelection = [];
 
-//93 symptoms
 List<int> finalDatasetAnswer = List.filled(193, 0);
+List<int> datasetCopy = List.filled(193, 0);
 
 Future<void> resetDataset() async {
   finalDatasetAnswer = List.filled(193, 0);
 }
+
+
+String theDogsName = '';
