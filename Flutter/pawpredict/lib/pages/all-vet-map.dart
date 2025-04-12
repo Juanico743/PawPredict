@@ -22,7 +22,6 @@ class _AllVetClinicState extends State<AllVetClinic> {
   final Location _locationController = Location();
   final Completer<GoogleMapController> _mapController = Completer<GoogleMapController>();
   LatLng? lastUserPosition;
-  List<dynamic>? vetClinics;
   List<LatLng> locations = [];
   Set<Polyline> _polylines = {};
   Set<Marker> markers = {};
@@ -59,7 +58,6 @@ class _AllVetClinicState extends State<AllVetClinic> {
 
 
   Future<void> _loadData() async {
-    await loadVeterinaryClinics();
     await getAllPinLocation(vetClinics!);
 
     while (currentUserPosition == null) {
@@ -105,26 +103,6 @@ class _AllVetClinicState extends State<AllVetClinic> {
     );
 
     setState(() {});
-  }
-
-  Future<void> loadVeterinaryClinics() async {
-    try {
-      String uri = '$serverUri/api/requestVeterinarianData/';
-      var res = await http.get(
-        Uri.parse(uri),
-        headers: {"Content-Type": "application/json"},
-      );
-
-      var response = jsonDecode(res.body);
-
-      if (response["success"] == true) {
-        setState(() {
-          vetClinics = response["vet_clinics"];
-        });
-      }
-    } catch (e) {
-      print("Error loading vet clinics: $e");
-    }
   }
 
   Future<void> getAllPinLocation(List<dynamic> vetClinics) async {

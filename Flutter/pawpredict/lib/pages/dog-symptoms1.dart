@@ -142,6 +142,12 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
 
     lineupQuestion = finalLineUp.toSet().difference(finalSelection.toSet()).toList();
 
+    for (var id in [101, 177]) {
+      if (!lineupQuestion.contains(id)) {
+        lineupQuestion.add(id);
+      }
+    }
+
     //print(lineupQuestion);
 
     Navigator.pushNamed(context, '/dog-symptoms2');

@@ -203,9 +203,10 @@ class CleanInsertDataset(APIView):
             DogDiseaseFindings(
                 name=name,  
                 severity=severity,
-                disease_description=description
+                disease_description=description,
+                specialization=specialization
             )
-            for name, severity, description in dog_disease_findings
+            for name, severity, description, specialization in dog_disease_findings
         ]
         DogDiseaseFindings.objects.bulk_create(findings)
 
@@ -327,11 +328,14 @@ class GetSeverityAndDescription(APIView):
             disease = DogDiseaseFindings.objects.get(name=disease_name)
             firstaid = DogDiseaseFirstAid.objects.filter(name=disease_name).values_list('firstAid', flat=True)
 
+            specialized = eval(disease.specialization)
+
             return Response({
                 "success": True,
                 "description": disease.disease_description,
                 "severity": disease.severity,
-                "firstaid": list(firstaid)
+                "firstaid": list(firstaid),
+                "specialized": specialized
             })
 
         except DogDiseaseFindings.DoesNotExist:

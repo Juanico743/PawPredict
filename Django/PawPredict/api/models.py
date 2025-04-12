@@ -62,6 +62,7 @@ class DogDiseaseFindings(models.Model):
     name = models.CharField(max_length=255, default="Unknown Disease")
     severity = models.CharField(max_length=50)
     disease_description = models.TextField()
+    specialization = models.TextField(default="[]")
 
     def __str__(self):
         return f"{self.name} - Severity: {self.severity}"

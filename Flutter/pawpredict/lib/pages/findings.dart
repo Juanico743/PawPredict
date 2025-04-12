@@ -8,6 +8,7 @@ import 'package:pawpredict/utils/appbar.dart';
 import 'package:pawpredict/utils/navbar.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart' as lottie;
+import 'package:url_launcher/url_launcher.dart';
 class Findings extends StatefulWidget {
   const Findings({super.key});
 
@@ -23,6 +24,7 @@ class _FindingsState extends State<Findings> {
   String diseaseSeverity = "";
 
   List<String> firstAid = [];
+  List<dynamic> specializedVet = [];
 
   bool loadingComplete = false;
 
@@ -40,6 +42,13 @@ class _FindingsState extends State<Findings> {
       currentPageTitle = 'Dog Findings';
     });
 
+  }
+
+  Future<void> setVetLocation(double lat, double lon) async {
+    setState(() {
+      vetPinLocationLat = lat;
+      vetPinLocationLon = lon;
+    });
   }
 
   Future<void> diseasePrediction() async {
@@ -91,6 +100,7 @@ class _FindingsState extends State<Findings> {
           diseaseDescription = response["description"];
           diseaseSeverity = response["severity"];
           firstAid = List<String>.from(response["firstaid"]);
+          specializedVet = response["specialized"];
 
           firstAid = firstAid.isEmpty
               ? [ "No First Aid Given Yet" ]
@@ -103,6 +113,48 @@ class _FindingsState extends State<Findings> {
     } catch (e) {
       print(e);
     }
+  }
+
+  List<Widget> getContactWidgets(Map clinic) {
+    final contact = clinic['contacts'][0];
+    return [
+      if (contact['facebook'] != '') contactsList(
+        title: 'Facebook',
+        image: 'assets/images/icons/facebook.png',
+        color: Color(0xFF0866FD),
+        url: contact['facebook'],
+      ),
+      if (contact['instagram'] != '') contactsList(
+        title: 'Instagram',
+        image: 'assets/images/icons/instagram.png',
+        color: Color(0xFFCE2871),
+        url: contact['instagram'],
+      ),
+      if (contact['gmail'] != '') contactsList(
+        title: 'Gmail',
+        image: 'assets/images/icons/email.png',
+        color: Color(0xFFE24133),
+        url: 'mailto:${contact['gmail']}?subject=News&body=',
+      ),
+      if (contact['contact_number'] != '') contactsList(
+        title: contact['contact_number'],
+        image: 'assets/images/icons/phone-call.png',
+        color: Color(0xFF5EBE3A),
+        url: 'sms:${contact['contact_number']}',
+      ),
+      if (contact['viber'] != '') contactsList(
+        title: 'Viber',
+        image: 'assets/images/icons/viber.png',
+        color: Color(0xFF6E5DE9),
+        url: '',
+      ),
+      if (contact['website'] != '') contactsList(
+        title: 'Website',
+        image: 'assets/images/icons/web.png',
+        color: Color(0xFF1E1E1E),
+        url: contact['website'],
+      ),
+    ];
   }
 
 
@@ -315,29 +367,172 @@ class _FindingsState extends State<Findings> {
 
                           SizedBox(height: 10),
 
-                          Text(
-                            'Veterinary clinics for this type of case:',
-                            style: TextStyle(
-                              color: Color(0xFF4A6FD7),
-                              fontFamily: 'Lexend',
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
+
+                          if (specializedVet.isNotEmpty)
+                            Column(
+                              children: [
+                                Text(
+                                  'Veterinary clinics for this type of case:',
+                                  style: TextStyle(
+                                    color: Color(0xFF4A6FD7),
+                                    fontFamily: 'Lexend',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                  ),
+                                ),
+
+                                SizedBox(height: 10),
+
+                                Column(
+                                  children: vetClinics == null
+                                      ? [
+                                    Column(
+                                      children: [
+                                        CircularProgressIndicator(),
+                                        SizedBox(height: 30.0),
+                                      ],
+                                    )
+                                  ]
+                                      : (() {
+                                    // Filter clinics by specializedVet list
+                                    List<dynamic> filteredClinics = vetClinics!
+                                        .where((clinic) => specializedVet.contains(clinic['id']))
+                                        .toList();
+
+                                    return List.generate(
+                                      (filteredClinics.length / 2).ceil(),
+                                          (index) {
+                                        int firstIndex = index * 2;
+                                        int secondIndex = firstIndex + 1;
+
+                                        var firstClinic = filteredClinics[firstIndex];
+                                        var secondClinic = secondIndex < filteredClinics.length
+                                            ? filteredClinics[secondIndex]
+                                            : null;
+
+                                        return Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            vetsRow(
+                                              children: [
+                                                vetIcon(
+                                                  title: firstClinic['name'],
+                                                  image: 'assets/images/vets/vet${firstClinic['id']}.png',
+                                                  location: firstClinic['info'][0]['address'] ?? '',
+                                                  weekDays: firstClinic['info'][0]['availability'] ?? '',
+                                                  regularTime: firstClinic['info'][0]['regular_hours'] ?? '',
+                                                  emergencyTime: firstClinic['info'][0]['emergency_hours'] ?? '',
+                                                  pinLocationLat: firstClinic['info'][0]['latitude'] ?? '',
+                                                  pinLocationLon: firstClinic['info'][0]['longitude'] ?? '',
+                                                  children: getContactWidgets(firstClinic),
+                                                ),
+                                                if (secondClinic != null)
+                                                  vetIcon(
+                                                    title: secondClinic['name'],
+                                                    image: 'assets/images/vets/vet${secondClinic['id']}.png',
+                                                    location: secondClinic['info'][0]['address'] ?? '',
+                                                    weekDays: secondClinic['info'][0]['availability'] ?? '',
+                                                    regularTime: secondClinic['info'][0]['regular_hours'] ?? '',
+                                                    emergencyTime: secondClinic['info'][0]['emergency_hours'] ?? '',
+                                                    pinLocationLat: secondClinic['info'][0]['latitude'] ?? '',
+                                                    pinLocationLon: secondClinic['info'][0]['longitude'] ?? '',
+                                                    children: getContactWidgets(secondClinic),
+                                                  ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 10.0),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  })(),
+                                ),
+
+                                SizedBox(height: 20),
+
+                                Text(
+                                  'Other Veterinary clinics we recommend:',
+                                  style: TextStyle(
+                                    color: Color(0xFF4A6FD7),
+                                    fontFamily: 'Lexend',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                  ),
+                                ),
+
+                                SizedBox(height: 10),
+
+                              ],
                             ),
+
+
+                          Column(
+                            children: vetClinics == null
+                                ? [
+                              Column(
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(height: 30.0),
+                                ],
+                              )
+                            ]
+                                : (() {
+                              // Only include clinics NOT in specializedVet
+                              List<dynamic> filteredClinics = vetClinics!
+                                  .where((clinic) => !specializedVet.contains(clinic['id']))
+                                  .toList();
+
+                              return List.generate(
+                                (filteredClinics.length / 2).ceil(),
+                                    (index) {
+                                  int firstIndex = index * 2;
+                                  int secondIndex = firstIndex + 1;
+
+                                  var firstClinic = filteredClinics[firstIndex];
+                                  var secondClinic = secondIndex < filteredClinics.length
+                                      ? filteredClinics[secondIndex]
+                                      : null;
+
+                                  return Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      vetsRow(
+                                        children: [
+                                          vetIcon(
+                                            title: firstClinic['name'],
+                                            image: 'assets/images/vets/vet${firstClinic['id']}.png',
+                                            location: firstClinic['info'][0]['address'] ?? '',
+                                            weekDays: firstClinic['info'][0]['availability'] ?? '',
+                                            regularTime: firstClinic['info'][0]['regular_hours'] ?? '',
+                                            emergencyTime: firstClinic['info'][0]['emergency_hours'] ?? '',
+                                            pinLocationLat: firstClinic['info'][0]['latitude'] ?? '',
+                                            pinLocationLon: firstClinic['info'][0]['longitude'] ?? '',
+                                            children: getContactWidgets(firstClinic),
+                                          ),
+                                          if (secondClinic != null)
+                                            vetIcon(
+                                              title: secondClinic['name'],
+                                              image: 'assets/images/vets/vet${secondClinic['id']}.png',
+                                              location: secondClinic['info'][0]['address'] ?? '',
+                                              weekDays: secondClinic['info'][0]['availability'] ?? '',
+                                              regularTime: secondClinic['info'][0]['regular_hours'] ?? '',
+                                              emergencyTime: secondClinic['info'][0]['emergency_hours'] ?? '',
+                                              pinLocationLat: secondClinic['info'][0]['latitude'] ?? '',
+                                              pinLocationLon: secondClinic['info'][0]['longitude'] ?? '',
+                                              children: getContactWidgets(secondClinic),
+                                            ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 10.0),
+                                    ],
+                                  );
+                                },
+                              );
+                            })(),
                           ),
 
-                          SizedBox(height: 10),
 
-                          Text(
-                            'Other Veterinary clinics we recommend:',
-                            style: TextStyle(
-                              color: Color(0xFF4A6FD7),
-                              fontFamily: 'Lexend',
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
-                            ),
-                          ),
-
-                          SizedBox(height: 10),
+                          SizedBox(height: 20),
 
                           GestureDetector(
                             onTap: (){
@@ -544,6 +739,432 @@ class _FindingsState extends State<Findings> {
             ),
           ),
         )
+      ],
+    );
+  }
+
+  Widget vetsRow({
+    required List<Widget> children,
+  }){
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children
+    );
+  }
+  Widget vetIcon({
+    required String title,
+    required String image,
+    required String location,
+    required String weekDays,
+    required String regularTime,
+    required String emergencyTime,
+    required double pinLocationLat,
+    required double pinLocationLon,
+    required List<Widget> children,
+  }){
+    return InkWell(
+      onTap: () {
+        setState(() {
+          singleVetImage = image;
+          singleVetName = title;
+        });
+
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (BuildContext context) {
+            return Wrap(
+              children: [
+                Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(15.0),
+                        topLeft: Radius.circular(50.0),
+                        bottomRight: Radius.circular(0.0),
+                        bottomLeft: Radius.circular(0.0),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Color(0xFF1DCFC1),
+                            borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(15.0),
+                              topLeft: Radius.circular(50.0),
+                              bottomRight: Radius.circular(15.0),
+                              bottomLeft: Radius.circular(50.0),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 2,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              SizedBox(height: 10.0),
+                              Row(
+                                children: [
+                                  SizedBox(width: 10.0),
+                                  Container(
+                                    margin: EdgeInsets.all(10),
+                                    height: 70.0,
+                                    width: 70.0,
+                                    decoration:BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(100.0),
+                                    ),
+                                    child: Container(
+                                      margin: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10.0),
+                                        image: DecorationImage(
+                                          image: AssetImage(image),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.0),
+                                  Container(
+                                    width: 230.0,
+                                    child: Text(
+                                      title,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'Lexend',
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 20.0,
+                                      ),
+                                      softWrap: true,
+                                      overflow: TextOverflow.visible,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10.0),
+                            ],
+                          ),
+                        ),
+
+
+                        GestureDetector(
+                          onTap: (){
+                            setVetLocation(pinLocationLat, pinLocationLon).then((_) => {
+                              setState(() {
+                                singleVetAvailability = weekDays;
+                                singleVetRegularHours = regularTime;
+                                singleVetEmergencyHours = emergencyTime;
+                              }),
+                              Navigator.pushNamed(context, '/vet-map')
+                            });
+                          },
+                          child: Container(
+                            margin: EdgeInsets.all(20),
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  spreadRadius: 2,
+                                  blurRadius: 2,
+                                  offset: Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height: 30.0,
+                                  width: 30.0,
+                                  margin: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  child: Image.asset(
+                                    'assets/images/icons/gps-p.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(horizontal: 5),
+                                    child: Text(
+                                      location,
+                                      style: TextStyle(
+                                        color: Color(0xFF4A6FD7),
+                                        fontFamily: 'Lexend',
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        if (weekDays.isNotEmpty)
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 30),
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 30.0,
+                                  width: 30.0,
+                                  margin: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  child: Image.asset(
+                                    'assets/images/icons/calendar-p.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(horizontal: 5),
+                                    child: Text(
+                                      weekDays,
+                                      style: TextStyle(
+                                        color: Color(0xFF4A6FD7),
+                                        fontFamily: 'Lexend',
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                        if (regularTime.isNotEmpty)
+                          Container(
+                            width: double.infinity,
+                            margin: EdgeInsets.symmetric(horizontal: 30),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Open Hours:',
+                                  style: TextStyle(
+                                    color: Color(0xFF091F5C),
+                                    fontFamily:'Lexend',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                                SizedBox(width: 5.0),
+                                Text(
+                                  regularTime,
+                                  style: TextStyle(
+                                    color: Color(0xFF4A6FD7),
+                                    fontFamily:'Lexend',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+
+                              ],
+                            ),
+                          ),
+                        if (emergencyTime.isNotEmpty)
+                          SizedBox(height: 5.0),
+                        if (emergencyTime.isNotEmpty)
+                          Container(
+                            width: double.infinity,
+                            margin: EdgeInsets.symmetric(horizontal: 30),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Emergency Hours:',
+                                  style: TextStyle(
+                                    color: Color(0xFF091F5C),
+                                    fontFamily:'Lexend',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                                SizedBox(width: 5.0),
+                                Text(
+                                  emergencyTime,
+                                  style: TextStyle(
+                                    color: Color(0xFF4A6FD7),
+                                    fontFamily:'Lexend',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                        SizedBox(height: 30.0),
+
+                        Column(
+                            children: children
+                        ),
+
+
+                        SizedBox(height: 20.0),
+
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            width: 120,
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFFFFFFF),
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border.all(
+                                width: 3,
+                                color: Color(0xFF1DCFC1),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  spreadRadius: 2,
+                                  blurRadius: 2,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Close',
+                                style: TextStyle(
+                                  color: Color(0xFF1DCFC1),
+                                  fontFamily: 'Lexend',
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 20.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 30.0),
+
+                      ],
+                    )
+                ),
+              ],
+            );
+          },
+        );
+      },
+      child: Container(
+        height: 185,
+        padding: EdgeInsets.all(10),
+        margin: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              spreadRadius: 1,
+              blurRadius: 2,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              height: 100.0,
+              width: 100.0,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                image: DecorationImage(
+                  image: AssetImage(image),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            SizedBox(height: 10.0),
+            Container(
+              width: 120.0,
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontFamily:'Lexend',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 12.0,
+                ),
+                softWrap: true,
+                overflow: TextOverflow.visible,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget contactsList({
+    required String title,
+    required String image,
+    required Color color,
+    required String url,
+  }){
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: (){
+            launchUrl(Uri.parse(url));
+          },
+          child: Container(
+            width: double.infinity,
+            margin: EdgeInsets.symmetric(horizontal: 30),
+            child: Row(
+              children: [
+                Container(
+                  height: 20.0,
+                  width: 20.0,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    image: DecorationImage(
+                      image: AssetImage(image),
+                      fit: BoxFit.cover,
+                      colorFilter: ColorFilter.mode(
+                        color,
+                        BlendMode.srcATop,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10.0),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: color,
+                    fontFamily:'Lexend',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 10.0),
       ],
     );
   }

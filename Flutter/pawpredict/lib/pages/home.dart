@@ -19,7 +19,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  List<dynamic>? vetClinics;
+
 
   int imagePage = 1;
   int counter = 0;
@@ -83,6 +83,48 @@ class _HomeState extends State<Home> {
       vetPinLocationLat = lat;
       vetPinLocationLon = lon;
     });
+  }
+
+  List<Widget> getContactWidgets(Map clinic) {
+    final contact = clinic['contacts'][0];
+    return [
+      if (contact['facebook'] != '') contactsList(
+        title: 'Facebook',
+        image: 'assets/images/icons/facebook.png',
+        color: Color(0xFF0866FD),
+        url: contact['facebook'],
+      ),
+      if (contact['instagram'] != '') contactsList(
+        title: 'Instagram',
+        image: 'assets/images/icons/instagram.png',
+        color: Color(0xFFCE2871),
+        url: contact['instagram'],
+      ),
+      if (contact['gmail'] != '') contactsList(
+        title: 'Gmail',
+        image: 'assets/images/icons/email.png',
+        color: Color(0xFFE24133),
+        url: 'mailto:${contact['gmail']}?subject=News&body=',
+      ),
+      if (contact['contact_number'] != '') contactsList(
+        title: contact['contact_number'],
+        image: 'assets/images/icons/phone-call.png',
+        color: Color(0xFF5EBE3A),
+        url: 'sms:${contact['contact_number']}',
+      ),
+      if (contact['viber'] != '') contactsList(
+        title: 'Viber',
+        image: 'assets/images/icons/viber.png',
+        color: Color(0xFF6E5DE9),
+        url: '',
+      ),
+      if (contact['website'] != '') contactsList(
+        title: 'Website',
+        image: 'assets/images/icons/web.png',
+        color: Color(0xFF1E1E1E),
+        url: contact['website'],
+      ),
+    ];
   }
 
 
@@ -498,56 +540,7 @@ class _HomeState extends State<Home> {
                                               emergencyTime: firstClinic['info'][0]['emergency_hours'] ?? '',
                                               pinLocationLat: firstClinic['info'][0]['latitude'] ?? '',
                                               pinLocationLon: firstClinic['info'][0]['longitude'] ?? '',
-                                              children: [
-                                                if (firstClinic['contacts'][0]['facebook'] != '')
-                                                  contactsList(
-                                                      title: 'Facebook',
-                                                      image: 'assets/images/icons/facebook.png',
-                                                      color: Color(0xFF0866FD),
-                                                      url: firstClinic['contacts'][0]['facebook']
-                                                  ),
-
-                                                if (firstClinic['contacts'][0]['instagram'] != '')
-                                                  contactsList(
-                                                      title: 'Instagram',
-                                                      image: 'assets/images/icons/instagram.png',
-                                                      color: Color(0xFFCE2871),
-                                                      url: firstClinic['contacts'][0]['instagram']
-                                                  ),
-
-
-                                                if (firstClinic['contacts'][0]['gmail'] != '')
-                                                  contactsList(
-                                                      title: 'Gmail',
-                                                      image: 'assets/images/icons/email.png',
-                                                      color: Color(0xFFE24133),
-                                                      url: 'mailto:${firstClinic['contacts'][0]['gmail']}?subject=News&body='
-                                                  ),
-
-                                                if (firstClinic['contacts'][0]['contact_number'] != '')
-                                                  contactsList(
-                                                      title: firstClinic['contacts'][0]['contact_number'],
-                                                      image: 'assets/images/icons/phone-call.png',
-                                                      color: Color(0xFF5EBE3A),
-                                                      url: 'sms:${firstClinic['contacts'][0]['contact_number']}'
-                                                  ),
-
-                                                if (firstClinic['contacts'][0]['viber'] != '')
-                                                  contactsList(
-                                                      title: 'Viber',
-                                                      image: 'assets/images/icons/viber.png',
-                                                      color: Color(0xFF6E5DE9),
-                                                      url: ''
-                                                  ),
-
-                                                if (firstClinic['contacts'][0]['website'] != '')
-                                                  contactsList(
-                                                      title: 'Website',
-                                                      image: 'assets/images/icons/web.png',
-                                                      color: Color(0xFF1E1E1E),
-                                                      url: firstClinic['contacts'][0]['website']
-                                                  ),
-                                              ],
+                                              children: getContactWidgets(firstClinic),
                                             ),
                                             if (secondClinic != null)
                                               vetIcon(
@@ -559,56 +552,7 @@ class _HomeState extends State<Home> {
                                                 emergencyTime: secondClinic['info'][0]['emergency_hours'] ?? '',
                                                 pinLocationLat: secondClinic['info'][0]['latitude'] ?? '',
                                                 pinLocationLon: secondClinic['info'][0]['longitude'] ?? '',
-                                                children: [
-                                                  if (secondClinic['contacts'][0]['facebook'] != '')
-                                                    contactsList(
-                                                      title: 'Facebook',
-                                                      image: 'assets/images/icons/facebook.png',
-                                                      color: Color(0xFF0866FD),
-                                                      url: secondClinic['contacts'][0]['facebook']
-                                                    ),
-
-                                                  if (secondClinic['contacts'][0]['instagram'] != '')
-                                                    contactsList(
-                                                      title: 'Instagram',
-                                                      image: 'assets/images/icons/instagram.png',
-                                                      color: Color(0xFFCE2871),
-                                                      url: secondClinic['contacts'][0]['instagram']
-                                                    ),
-
-
-                                                  if (secondClinic['contacts'][0]['gmail'] != '')
-                                                    contactsList(
-                                                      title: 'Gmail',
-                                                      image: 'assets/images/icons/email.png',
-                                                      color: Color(0xFFE24133),
-                                                      url: 'mailto:${secondClinic['contacts'][0]['gmail']}?subject=News&body='
-                                                    ),
-
-                                                  if (secondClinic['contacts'][0]['contact_number'] != '')
-                                                    contactsList(
-                                                      title: secondClinic['contacts'][0]['contact_number'],
-                                                      image: 'assets/images/icons/phone-call.png',
-                                                      color: Color(0xFF5EBE3A),
-                                                      url: 'sms:${secondClinic['contacts'][0]['contact_number']}'
-                                                    ),
-
-                                                  if (secondClinic['contacts'][0]['viber'] != '')
-                                                    contactsList(
-                                                      title: 'Viber',
-                                                      image: 'assets/images/icons/viber.png',
-                                                      color: Color(0xFF6E5DE9),
-                                                      url: ''
-                                                    ),
-
-                                                  if (secondClinic['contacts'][0]['website'] != '')
-                                                    contactsList(
-                                                      title: 'Website',
-                                                      image: 'assets/images/icons/web.png',
-                                                      color: Color(0xFF1E1E1E),
-                                                      url: secondClinic['contacts'][0]['website']
-                                                    ),
-                                                ],
+                                                children: getContactWidgets(secondClinic),
                                               ),
                                           ],
                                         ),
