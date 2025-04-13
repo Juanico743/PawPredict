@@ -30,6 +30,12 @@ from django.http import JsonResponse
 import numpy as np
 import json
 
+
+
+from rest_framework import status
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+
 # pip install djangorestframework
 # pip install pandas scikit-learn django numpy
 
@@ -49,7 +55,7 @@ try:
         raise ValueError("NaN values found in the target variable (y).")
 
     model.fit(X, y)
-    #Get Feature names from trained model
+    
     feature_names = X.columns 
     accuracy = model.score(X, y) * 100
 
@@ -98,6 +104,56 @@ class PredictDisease(APIView):
         except Exception as e:
             return JsonResponse({"error": f"Error: {e}"}, status=500)
 
+
+class ViewModelPerformanceEvaluationTable(APIView):
+    def get(self, request):
+        try:
+            # Load the dataset
+            data = pd.read_csv("PawPredictDataset.csv")
+            X = data.drop("Disease", axis=1)
+            y = data["Disease"]
+            X = X.fillna(0)
+
+            # Validate
+            if X.isnull().any().any():
+                raise ValueError("NaN values still found in the feature set (X).")
+            if y.isnull().any():
+                raise ValueError("NaN values found in the target variable (y).")
+
+            # Split the dataset into train and test
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+            # Train the model
+            model = LogisticRegression(max_iter=1000)
+            model.fit(X_train, y_train)
+
+            # Predict on test set
+            y_pred = model.predict(X_test)
+
+            # Classification report
+            report = classification_report(y_test, y_pred, output_dict=True, zero_division=0)
+
+            diseases = [label for label in report.keys() if label not in ['accuracy', 'macro avg', 'weighted avg']]
+            results = []
+
+            for disease in diseases:
+                metrics = report[disease]
+                results.append({
+                    "Disease": disease,
+                    "Accuracy": report['accuracy'],  # overall test accuracy
+                    "Precision": metrics["precision"],
+                    "Recall": metrics["recall"],
+                    "F1-Score": metrics["f1-score"]
+                })
+
+            return JsonResponse(results, safe=False)
+
+        except FileNotFoundError:
+            return JsonResponse({'error': "CSV not found."}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as ve:
+            return JsonResponse({'error': f"Data issue: {ve}"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return JsonResponse({'error': f"Error loading: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -325,9 +381,13 @@ class GetSeverityAndDescription(APIView):
             return Response({"success": False, "message": "Disease name is required"}, status=400)
 
         try:
-            disease = DogDiseaseFindings.objects.get(name=disease_name)
-            firstaid = DogDiseaseFirstAid.objects.filter(name=disease_name).values_list('firstAid', flat=True)
+            disease = DogDiseaseFindings.objects.filter(name=disease_name).first()
+            
+            if not disease:
+                return Response({"success": False, "message": "Disease not found"}, status=404)
 
+            firstaid = DogDiseaseFirstAid.objects.filter(name=disease_name).values_list('firstAid', flat=True).distinct()[:5]
+            
             specialized = eval(disease.specialization)
 
             return Response({
@@ -338,8 +398,8 @@ class GetSeverityAndDescription(APIView):
                 "specialized": specialized
             })
 
-        except DogDiseaseFindings.DoesNotExist:
-            return Response({"success": False, "message": "Disease not found"}, status=404)
+        except Exception as e:
+            return Response({"success": False, "message": str(e)}, status=500)
 
 
 class GetVetNames(APIView):

@@ -91,6 +91,7 @@ class Navbar extends StatelessWidget {
                   underlineColor: Color(0xFF1DCFC1),
                   underlineWidth: 70,
                   onPressed: () {
+                    Navigator.of(context).pop();
                     Navigator.pushNamed(context, '/home');
                   }
                 ),
@@ -101,6 +102,7 @@ class Navbar extends StatelessWidget {
                   underlineColor: Colors.transparent,
                   underlineWidth: 70,
                   onPressed: () {
+                    Navigator.of(context).pop();
                     Navigator.pushNamed(context, '/about');
                   }
                 ),
@@ -111,6 +113,7 @@ class Navbar extends StatelessWidget {
                   underlineColor: Colors.transparent,
                   underlineWidth: 130,
                   onPressed: () {
+                    Navigator.of(context).pop();
                     Navigator.pushNamed(context, '/help');
                   }
                 ),
@@ -121,6 +124,7 @@ class Navbar extends StatelessWidget {
                   underlineColor: Colors.transparent,
                   underlineWidth: 100,
                   onPressed: () {
+                    Navigator.of(context).pop();
                     Navigator.pushNamed(context, '/all-vet-map' );
                   }
                 ),

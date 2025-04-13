@@ -28,6 +28,8 @@ class _FindingsState extends State<Findings> {
 
   bool loadingComplete = false;
 
+  bool otherVet = false;
+
   @override
   void initState() {
     super.initState();
@@ -383,6 +385,8 @@ class _FindingsState extends State<Findings> {
 
                                 SizedBox(height: 10),
 
+
+
                                 Column(
                                   children: vetClinics == null
                                       ? [
@@ -394,7 +398,6 @@ class _FindingsState extends State<Findings> {
                                     )
                                   ]
                                       : (() {
-                                    // Filter clinics by specializedVet list
                                     List<dynamic> filteredClinics = vetClinics!
                                         .where((clinic) => specializedVet.contains(clinic['id']))
                                         .toList();
@@ -466,71 +469,114 @@ class _FindingsState extends State<Findings> {
                             ),
 
 
-                          Column(
-                            children: vetClinics == null
-                                ? [
-                              Column(
+                          GestureDetector(
+                            onTap: (){
+                              setState(() {
+                                otherVet = !otherVet;
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Color(0xFFDBF7FF),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  CircularProgressIndicator(),
-                                  SizedBox(height: 30.0),
+                                  Text(
+                                    "View More",
+                                    style: TextStyle(
+                                      color: Color(0xFF4A6FD7),
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.keyboard_arrow_down_rounded,
+                                    color: Color(0xFF4A6FD7),
+                                  )
                                 ],
-                              )
-                            ]
-                                : (() {
-                              // Only include clinics NOT in specializedVet
-                              List<dynamic> filteredClinics = vetClinics!
-                                  .where((clinic) => !specializedVet.contains(clinic['id']))
-                                  .toList();
-
-                              return List.generate(
-                                (filteredClinics.length / 2).ceil(),
-                                    (index) {
-                                  int firstIndex = index * 2;
-                                  int secondIndex = firstIndex + 1;
-
-                                  var firstClinic = filteredClinics[firstIndex];
-                                  var secondClinic = secondIndex < filteredClinics.length
-                                      ? filteredClinics[secondIndex]
-                                      : null;
-
-                                  return Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      vetsRow(
-                                        children: [
-                                          vetIcon(
-                                            title: firstClinic['name'],
-                                            image: 'assets/images/vets/vet${firstClinic['id']}.png',
-                                            location: firstClinic['info'][0]['address'] ?? '',
-                                            weekDays: firstClinic['info'][0]['availability'] ?? '',
-                                            regularTime: firstClinic['info'][0]['regular_hours'] ?? '',
-                                            emergencyTime: firstClinic['info'][0]['emergency_hours'] ?? '',
-                                            pinLocationLat: firstClinic['info'][0]['latitude'] ?? '',
-                                            pinLocationLon: firstClinic['info'][0]['longitude'] ?? '',
-                                            children: getContactWidgets(firstClinic),
-                                          ),
-                                          if (secondClinic != null)
-                                            vetIcon(
-                                              title: secondClinic['name'],
-                                              image: 'assets/images/vets/vet${secondClinic['id']}.png',
-                                              location: secondClinic['info'][0]['address'] ?? '',
-                                              weekDays: secondClinic['info'][0]['availability'] ?? '',
-                                              regularTime: secondClinic['info'][0]['regular_hours'] ?? '',
-                                              emergencyTime: secondClinic['info'][0]['emergency_hours'] ?? '',
-                                              pinLocationLat: secondClinic['info'][0]['latitude'] ?? '',
-                                              pinLocationLon: secondClinic['info'][0]['longitude'] ?? '',
-                                              children: getContactWidgets(secondClinic),
-                                            ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 10.0),
-                                    ],
-                                  );
-                                },
-                              );
-                            })(),
+                              ),
+                            ),
                           ),
 
+                          AnimatedSwitcher(
+                            duration: Duration(milliseconds: 300),
+                            transitionBuilder: (Widget child, Animation<double> animation) {
+                              return FadeTransition(opacity: animation, child: child);
+                            },
+                            child: otherVet
+                                ? Column(
+                              key: ValueKey('otherVetShown'),
+                              children: [
+                                SizedBox(height: 10),
+                                Column(
+                                  children: vetClinics == null
+                                      ? [
+                                    Column(
+                                      children: [
+                                        CircularProgressIndicator(),
+                                        SizedBox(height: 30.0),
+                                      ],
+                                    )
+                                  ]
+                                      : (() {
+                                    List<dynamic> filteredClinics = vetClinics!
+                                        .where((clinic) => !specializedVet.contains(clinic['id']))
+                                        .toList();
+
+                                    return List.generate(
+                                      (filteredClinics.length / 2).ceil(),
+                                          (index) {
+                                        int firstIndex = index * 2;
+                                        int secondIndex = firstIndex + 1;
+
+                                        var firstClinic = filteredClinics[firstIndex];
+                                        var secondClinic = secondIndex < filteredClinics.length
+                                            ? filteredClinics[secondIndex]
+                                            : null;
+
+                                        return Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            vetsRow(
+                                              children: [
+                                                vetIcon(
+                                                  title: firstClinic['name'],
+                                                  image: 'assets/images/vets/vet${firstClinic['id']}.png',
+                                                  location: firstClinic['info'][0]['address'] ?? '',
+                                                  weekDays: firstClinic['info'][0]['availability'] ?? '',
+                                                  regularTime: firstClinic['info'][0]['regular_hours'] ?? '',
+                                                  emergencyTime: firstClinic['info'][0]['emergency_hours'] ?? '',
+                                                  pinLocationLat: firstClinic['info'][0]['latitude'] ?? '',
+                                                  pinLocationLon: firstClinic['info'][0]['longitude'] ?? '',
+                                                  children: getContactWidgets(firstClinic),
+                                                ),
+                                                if (secondClinic != null)
+                                                  vetIcon(
+                                                    title: secondClinic['name'],
+                                                    image: 'assets/images/vets/vet${secondClinic['id']}.png',
+                                                    location: secondClinic['info'][0]['address'] ?? '',
+                                                    weekDays: secondClinic['info'][0]['availability'] ?? '',
+                                                    regularTime: secondClinic['info'][0]['regular_hours'] ?? '',
+                                                    emergencyTime: secondClinic['info'][0]['emergency_hours'] ?? '',
+                                                    pinLocationLat: secondClinic['info'][0]['latitude'] ?? '',
+                                                    pinLocationLon: secondClinic['info'][0]['longitude'] ?? '',
+                                                    children: getContactWidgets(secondClinic),
+                                                  ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 10.0),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  })(),
+                                ),
+                              ],
+                            )
+                                : SizedBox.shrink(key: ValueKey('otherVetHidden')),
+                          ),
 
                           SizedBox(height: 20),
 
@@ -565,7 +611,7 @@ class _FindingsState extends State<Findings> {
 
                                   SizedBox(width: 5),
                                   Text(
-                                    'Nearest Veterinary Clinic',
+                                    'Nearest Veterinary Clinic (Antipolo)',
                                     style: TextStyle(
                                       color: Color(0xFFFFFFFF),
                                       fontFamily: 'Lexend',

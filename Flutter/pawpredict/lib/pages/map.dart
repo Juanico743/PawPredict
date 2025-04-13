@@ -70,61 +70,31 @@ class _VetMapState extends State<VetMap> {
       if (currentLocation.latitude != null && currentLocation.longitude != null) {
         LatLng newPosition = LatLng(currentLocation.latitude!, currentLocation.longitude!);
 
-        if (lastUserPosition != null) {
-          double distance = Geolocator.distanceBetween(
-              lastUserPosition!.latitude, lastUserPosition!.longitude,
-              newPosition.latitude, newPosition.longitude);
-          if (distance >= 100) {
-            if (mounted) {
-              setState(() {
-                currentUserPosition = newPosition;
-                _cameraToPosition(currentUserPosition!);
-              });
-            }
-            if (!_routeFetched) {
-              _getRoute().then((_) => {
-                _routeFetched = true
-              });
-            }
-            lastUserPosition = newPosition;
-          }
-        } else {
-          lastUserPosition = newPosition;
-          if (mounted) {
-            setState(() {
-              currentUserPosition = newPosition;
-              _cameraToPosition(currentUserPosition!);
-            });
-          }
-          if (!_routeFetched) {
-            _getRoute().then((_) => {
-              _routeFetched = true
-            });
-          }
+        lastUserPosition = newPosition;
+
+        if (mounted) {
+          setState(() {
+            currentUserPosition = newPosition;
+            _getRoute(selectedVet);
+            //_cameraToPosition(currentUserPosition!);
+          });
+        }
+
+        if (!_routeFetched) {
+          _getRoute(selectedVet).then((_) => {
+            _routeFetched = true,
+            _cameraToPosition(currentUserPosition!),
+          });
         }
       }
     });
   }
 
-  Future<void> _getRoute() async {
+
+  Future<void> _getRoute(LatLng endPoint) async {
     if (currentUserPosition == null) return;
 
-    List<LatLng> destinations = [
-      selectedVet
-    ];
-
-    double shortestDistance = double.infinity;
-    LatLng nearestDestination = destinations[0];
-
-    for (LatLng destination in destinations) {
-      double distance = await OSRMService.getTravelDistance(currentUserPosition!, destination);
-      if (distance < shortestDistance) {
-        shortestDistance = distance;
-        nearestDestination = destination;
-      }
-    }
-
-    List<LatLng> routePoints = await OSRMService.getRouteCoordinates(currentUserPosition!, nearestDestination);
+    List<LatLng> routePoints = await OSRMService.getRouteCoordinates(currentUserPosition!, endPoint);
 
     setState(() {
       _polylines.clear();

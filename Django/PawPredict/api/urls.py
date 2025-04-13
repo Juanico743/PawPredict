@@ -8,7 +8,9 @@ from .views import (
     GetQuestionLineUp, 
     PredictDisease,
     GetSeverityAndDescription,
-    GetVetNames
+    GetVetNames,
+
+    ViewModelPerformanceEvaluationTable
 )
 
 urlpatterns = [
@@ -24,4 +26,6 @@ urlpatterns = [
  
     path('predictdescription/', GetSeverityAndDescription.as_view(), name='predict-description'),  
     path('getvetnames/', GetVetNames.as_view(), name='get-vet-names'),
+
+    path('gettable/', ViewModelPerformanceEvaluationTable.as_view(), name='gettable'),
 ]

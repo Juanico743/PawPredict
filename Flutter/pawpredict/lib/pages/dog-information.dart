@@ -79,7 +79,7 @@ class _DogInformationState extends State<DogInformation> {
       finalDatasetAnswer[finalDatasetAnswer.length - 1] = 1;
     }
 
-    datasetCopy = finalDatasetAnswer;
+    datasetCopy = List.from(finalDatasetAnswer);
 
     //print(finalDatasetAnswer);
     Navigator.pushNamed(context, '/dog-symptoms1');

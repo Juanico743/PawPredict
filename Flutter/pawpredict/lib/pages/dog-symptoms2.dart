@@ -66,9 +66,6 @@ class _DogSymptoms2State extends State<DogSymptoms2> {
         questionTemp['display description'] = false;
 
         questionsCollected['Q$questionId'] = questionTemp;
-
-
-
       }
     } catch (e) {
       print(e);
@@ -118,7 +115,7 @@ class _DogSymptoms2State extends State<DogSymptoms2> {
 
   Future<void> getAllYes() async {
     allYes = [];
-    finalDatasetAnswer = datasetCopy;
+    finalDatasetAnswer = List.from(datasetCopy);
 
     allYes = questionsCollected.entries
         .where((entry) => entry.value['answer'] == 1)
@@ -133,6 +130,10 @@ class _DogSymptoms2State extends State<DogSymptoms2> {
     for (int id in finalSelection) {
       finalDatasetAnswer[id - 1] = 1;
     }
+
+    print("YOW");
+    print(datasetCopy);
+    print("Aye");
 
     print(finalDatasetAnswer);
   }

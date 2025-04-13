@@ -44,6 +44,8 @@ class _AllVetClinicState extends State<AllVetClinic> {
   String _regularHours = "";
   String _emergencyHours = "";
 
+  LatLng? selectedLocation;
+
 
 
 
@@ -145,9 +147,11 @@ class _AllVetClinicState extends State<AllVetClinic> {
             icon: vetPinIcon!,
             onTap: () {
               setState(() {
-                _getPolylines(currentUserPosition!, locations[i]);
+                selectedLocation = locations[i];
                 pinInfoVisible = false;
               });
+
+              _getPolylines(currentUserPosition!, selectedLocation!);
 
               Future.delayed(Duration(milliseconds: 250), () {
                 setState(() {
@@ -186,41 +190,31 @@ class _AllVetClinicState extends State<AllVetClinic> {
       if (currentLocation.latitude != null && currentLocation.longitude != null) {
         LatLng newPosition = LatLng(currentLocation.latitude!, currentLocation.longitude!);
 
-        if (lastUserPosition != null) {
-          double distance = Geolocator.distanceBetween(
-              lastUserPosition!.latitude, lastUserPosition!.longitude,
-              newPosition.latitude, newPosition.longitude);
-          if (distance >= 1) {
-            if (mounted) {
-              setState(() {
-                currentUserPosition = newPosition;
-                //_cameraToPosition(currentUserPosition!);
-              });
+        lastUserPosition = newPosition;
+
+        if (mounted) {
+          setState(() {
+            currentUserPosition = newPosition;
+            if (selectedLocation != null) {
+              _getPolylines(currentUserPosition!, selectedLocation!);
             }
-            if (!_routeFetched) {
-              _getRoute().then((_) => {
-                _routeFetched = true,
-              });
-            }
-            lastUserPosition = newPosition;
-          }
-        } else {
-          lastUserPosition = newPosition;
-          if (mounted) {
-            setState(() {
-              currentUserPosition = newPosition;
-              //_cameraToPosition(currentUserPosition!);
-            });
-          }
-          if (!_routeFetched) {
-            _getRoute().then((_) => {
-              _routeFetched = true,
-            });
-          }
+            //_cameraToPosition(currentUserPosition!);
+          });
+          setMarkers();
+        }
+
+        //_routeFetched = true;
+
+        if (!_routeFetched) {
+          _getRoute().then((_) {
+            _routeFetched = true;
+            _cameraToPosition(currentUserPosition!);
+          });
         }
       }
     });
   }
+
 
   Future<void> _getRoute() async {
     if (currentUserPosition == null) return;
@@ -237,7 +231,11 @@ class _AllVetClinicState extends State<AllVetClinic> {
       }
     }
 
-    _getPolylines(currentUserPosition!, nearestDestination);
+    setState(() {
+      selectedLocation = nearestDestination;
+    });
+
+    _getPolylines(currentUserPosition!, selectedLocation!);
   }
 
   Future<void> _getPolylines(LatLng location1, LatLng location2) async {
@@ -395,105 +393,110 @@ class _AllVetClinicState extends State<AllVetClinic> {
               child: Column(
                 children: [
                   SizedBox(height: 30),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            spreadRadius: 2,
-                            blurRadius: 2,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                height: 30.0,
-                                width: 30.0,
-                                margin: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                child: Image.asset(
-                                  'assets/images/icons/calendar-p.png',
-                                  fit: BoxFit.cover,
-                                ),
+                  if (_availability.isNotEmpty || _regularHours.isNotEmpty || _emergencyHours.isNotEmpty)
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 2,
+                              blurRadius: 2,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            if (_availability.isNotEmpty)
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 30.0,
+                                    width: 30.0,
+                                    margin: EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    child: Image.asset(
+                                      'assets/images/icons/calendar-p.png',
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      margin: EdgeInsets.symmetric(horizontal: 5),
+                                      child: Text(
+                                        _availability,
+                                        style: TextStyle(
+                                          color: Color(0xFF4A6FD7),
+                                          fontFamily: 'Lexend',
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 5),
-                                  child: Text(
-                                    _availability,
+                            if (_regularHours.isNotEmpty)
+                              Row(
+                                children: [
+                                  Text(
+                                    'Open Hours:',
                                     style: TextStyle(
-                                      color: Color(0xFF4A6FD7),
-                                      fontFamily: 'Lexend',
+                                      color: Color(0xFF091F5C),
+                                      fontFamily:'Lexend',
                                       fontWeight: FontWeight.w400,
                                       fontSize: 14.0,
                                     ),
                                   ),
-                                ),
+                                  SizedBox(width: 5.0),
+                                  Text(
+                                    _regularHours,
+                                    style: TextStyle(
+                                      color: Color(0xFF4A6FD7),
+                                      fontFamily:'Lexend',
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14.0,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                'Open Hours:',
-                                style: TextStyle(
-                                  color: Color(0xFF091F5C),
-                                  fontFamily:'Lexend',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14.0,
-                                ),
+                            if (_emergencyHours.isNotEmpty)
+                              SizedBox(height: 5.0),
+                            if (_emergencyHours.isNotEmpty)
+                              Row(
+                                children: [
+                                  Text(
+                                    'Emergency Hours:',
+                                    style: TextStyle(
+                                      color: Color(0xFF091F5C),
+                                      fontFamily:'Lexend',
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14.0,
+                                    ),
+                                  ),
+                                  SizedBox(width: 5.0),
+                                  Text(
+                                    _emergencyHours,
+                                    style: TextStyle(
+                                      color: Color(0xFF4A6FD7),
+                                      fontFamily:'Lexend',
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14.0,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              SizedBox(width: 5.0),
-                              Text(
-                                _regularHours,
-                                style: TextStyle(
-                                  color: Color(0xFF4A6FD7),
-                                  fontFamily:'Lexend',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14.0,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 5.0),
-                          Row(
-                            children: [
-                              Text(
-                                'Emergency Hours:',
-                                style: TextStyle(
-                                  color: Color(0xFF091F5C),
-                                  fontFamily:'Lexend',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14.0,
-                                ),
-                              ),
-                              SizedBox(width: 5.0),
-                              Text(
-                                _emergencyHours,
-                                style: TextStyle(
-                                  color: Color(0xFF4A6FD7),
-                                  fontFamily:'Lexend',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14.0,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.all(10),
