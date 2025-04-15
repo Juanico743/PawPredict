@@ -311,7 +311,7 @@ class _HelpCenterState extends State<HelpCenter> {
                               GestureDetector(
                                 onTap: () {
                                   String email = _feedback.text;
-                                  launchUrl(Uri.parse('mailto:example@gmail.com?subject=Feedback%20%26%20Suggestions&body=$email'));
+                                  launchUrl(Uri.parse('mailto:pawpredict@gmail.com?subject=Feedback%20%26%20Suggestions&body=$email'));
                                 },
                                 child: Container(
                                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -352,7 +352,7 @@ class _HelpCenterState extends State<HelpCenter> {
                             ),
                           ),
                           Text(
-                            '© SCAS-BSCS-2025',
+                            "© 2025 NJCGA || SCAS - BSCS",
                             style: TextStyle(
                                 color: Color(0XFF1E1E1E),
                                 fontFamily: 'lexend'

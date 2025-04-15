@@ -247,7 +247,7 @@ class _AboutState extends State<About> {
                             ),
                           ),
                           Text(
-                            '© SCAS-BSCS-2025',
+                            "© 2025 NJCGA || SCAS - BSCS",
                             style: TextStyle(
                                 color: Color(0XFF1E1E1E),
                                 fontFamily: 'lexend'

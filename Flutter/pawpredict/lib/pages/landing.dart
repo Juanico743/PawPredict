@@ -128,7 +128,7 @@ class _LandingState extends State<Landing> {
                   color: Color(0xFF9EFFF8),
                   child: Center (
                     child: Text(
-                      '© 2025 NJCGA | SCAS - BSCS',
+                      "© 2025 NJCGA || SCAS - BSCS",
                       style: TextStyle(
                           color: Color(0XFF1E1E1E),
                           fontFamily: 'lexend'

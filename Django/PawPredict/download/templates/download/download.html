@@ -15,12 +15,30 @@
         <img src="{% static 'download/images/PawPredict-logo.png' %}" alt="PawPredictLogo">
     </header>
 
+    <section class="video-container">
+        <video width="100%" controls poster="{% static 'download/images/pawpredict-thumbnail.jpg' %}">
+            <source src="{% static 'download/videos/PawPredict.mp4' %}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </section>
+
+    <!-- <section class="video-container">
+        <div class="video-wrapper">
+            <iframe width="100%" height="315" 
+                src="https://www.youtube.com/embed/GqoaCJy-PH0" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </section> -->
+
     <main>
         <h2>Download Now</h2>
         <p class="muted">Easily predict potential dog diseases based on observable symptoms with Paw Predict. This smart and intuitive app helps pet owners assess their dog's health and provides guidance on possible conditions.</p>
         
         <div>
-            <p><strong>Version: </strong>v1.0.0 (2-27-2025)</p>
+            <p><strong>Version: </strong>v1.0.0 (4-16-2025)</p>
             <p><strong>File Size: </strong>{{ file_size }} MB</p>
             <p><strong>Downloads: </strong>{{ total_downloads }}</p>
             <button id="downloadButton">Download APK</button>
@@ -41,12 +59,12 @@
 
     <section>
         <h3>Need Help?</h3>
-        <p>Email: <a href="mailto:support@pawpredict.com">support@pawpredict.com</a></p>
+        <p>Email: <a href="mailto:pawpredict@gmail.com">pawpredict@gmail.com</a></p>
     </section>
 
     <footer>
         <img src="{% static 'download/images/PawPredict-minimal-logo.png' %}" alt="PawPredictLogo">
-        <p>&copy; SCAS-BSCS-2025</p>
+        <p>© 2025 NJCGA || SCAS - BSCS</p>
     </footer>
 
     <script>
