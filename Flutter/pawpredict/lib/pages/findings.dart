@@ -66,7 +66,7 @@ class _FindingsState extends State<Findings> {
       );
 
       var response = jsonDecode(res.body);
-      //print(res.body);
+      print(res.body);
 
       if (response["success"] == true) {
         setState(() {
@@ -317,6 +317,18 @@ class _FindingsState extends State<Findings> {
 
                           SizedBox(height: 30),
 
+                          titleText(text: 'Other Possible Disease'),
+
+                          SizedBox(height: 10),
+
+                          otherDiseaseList(name: 'Disease 1'),
+
+
+
+
+
+                          SizedBox(height: 30),
+
                           titleText(text: 'First Aid Recomendation'),
 
                           SizedBox(height: 10),
@@ -356,6 +368,7 @@ class _FindingsState extends State<Findings> {
                                       color: Colors.black,
                                       fontFamily: 'Lexend',
                                       fontWeight: FontWeight.w400,
+                                      fontSize: 15,
                                     ),
                                   ),
                                 ],
@@ -1164,6 +1177,40 @@ class _FindingsState extends State<Findings> {
       ),
     );
   }
+
+  Widget otherDiseaseList({
+    required String name
+  }){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          name,
+          style: TextStyle(
+            color: Color(0xFF4A6FD7),
+            fontFamily: 'Lexend',
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+          ),
+        ),
+        Column(
+          children: [
+            normalText(text: 'sdfsdfsdfsssfdfsdfsfddddddddddddddddddddddddddddddddddddddd'),
+            SizedBox(height: 5  ),
+            Container(
+              height: 1,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Color(0xFF1DCFC1),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            )
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget contactsList({
     required String title,
     required String image,

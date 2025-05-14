@@ -1,6 +1,6 @@
 library globals;
 
-String serverUri = "http://192.168.1.9:8000";
+String serverUri = "https://pawpredict.pythonanywhere.com";
 const String googleMapAPI = "AIzaSyC4O5JIbDyCnarQiUc0eQmhbQwel186NHw";
 
 List<dynamic>? vetClinics;

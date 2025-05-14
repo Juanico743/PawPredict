@@ -294,14 +294,45 @@ class _DogSymptoms2State extends State<DogSymptoms2> {
                                                 questionsCollected['Q${index + 1}']!['display description'] = !questionsCollected['Q${index + 1}']!['display description'];
                                               });
                                             },
-                                            child: Text(
-                                              questionsCollected['Q${index + 1}']!['question'],
-                                              style: TextStyle(
-                                                color: Color(0xFF091F5C),
-                                                fontFamily: 'Lexend',
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 18.0,
-                                              ),
+                                            child: Row(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+
+
+
+                                                Expanded(
+                                                  child: Text(
+                                                    questionsCollected['Q${index + 1}']!['question'],
+                                                    style: TextStyle(
+                                                      color: Color(0xFF091F5C),
+                                                      fontFamily: 'Lexend',
+                                                      fontWeight: FontWeight.w700,
+                                                      fontSize: 18.0,
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                Container(
+                                                    padding: EdgeInsets.all(3),
+                                                    margin: EdgeInsets.only(left: 6),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(100.0),
+                                                      color: Color(0xFFCAFFFB),
+                                                    ),
+                                                    child: Center(
+                                                      child: Transform.rotate(
+                                                        angle: (questionsCollected['Q${index + 1}']!['display description'] == true) ? 0 : 3.1416,
+                                                        child: Image.asset(
+                                                          'assets/images/icons/arrow-map.png',
+                                                          height: 19,
+                                                          width: 19,
+                                                          fit: BoxFit.contain,
+                                                        ),
+                                                      ),
+                                                    )
+                                                ),
+
+                                              ],
                                             ),
                                           ),
 
@@ -309,22 +340,20 @@ class _DogSymptoms2State extends State<DogSymptoms2> {
                                           AnimatedSize(
                                             duration: Duration(milliseconds: 300),
                                             curve: Curves.easeInOut,
-                                            child: Visibility(
-                                              visible: (questionsCollected['Q${index + 1}']!['display description'] == true),
-                                              child: Container(
-                                                padding: EdgeInsets.all(10.0),
-                                                decoration: BoxDecoration(
-                                                  color: Color(0xFFCAFFFB),
-                                                  borderRadius: BorderRadius.circular(15.0),
-                                                ),
-                                                child: Text(
-                                                  questionsCollected['Q${index + 1}']!['description'],
-                                                  style: TextStyle(
-                                                    color: Color(0xFF344C9E),
-                                                    fontFamily: 'Lexend',
-                                                    fontWeight: FontWeight.w400,
-                                                    fontSize: 13.0,
-                                                  ),
+                                            child: Container(
+                                              height: (questionsCollected['Q${index + 1}']!['display description'] == true) ? null : 0,
+                                              padding: EdgeInsets.all(10.0),
+                                              decoration: BoxDecoration(
+                                                color: Color(0xFFCAFFFB),
+                                                borderRadius: BorderRadius.circular(15.0),
+                                              ),
+                                              child: Text(
+                                                questionsCollected['Q${index + 1}']!['description'],
+                                                style: TextStyle(
+                                                  color: Color(0xFF344C9E),
+                                                  fontFamily: 'Lexend',
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 13.0,
                                                 ),
                                               ),
                                             ),

@@ -43,10 +43,10 @@ myerror = ""
 
 try:
     model = LogisticRegression()
-    data = pd.read_csv("PawPredictDataset.csv")  # Assumes a header row
+    data = pd.read_csv("PawPredictDataset.csv")  
     X = data.drop("Disease", axis=1)
     y = data["Disease"]
-    X = X.fillna(0) # Fill NaN before checking
+    X = X.fillna(0) 
 
     if X.isnull().any().any():
         raise ValueError(f"NaN values still found in the feature set (X).")

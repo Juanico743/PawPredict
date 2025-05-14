@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -32,6 +33,10 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
 
   TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> filteredSymptoms = [];
+
+
+  bool _canTap = true;
+  bool _loading = false;
 
 
   @override
@@ -74,6 +79,11 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
           }
         }).toList();
       }
+
+      filteredSymptoms = filteredSymptoms.where((symptom) {
+        final name = symptom['name']?.toString() ?? '';
+        return name != 'Lack of Appetite' && name != 'Weakness';
+      }).toList();
     });
   }
 
@@ -148,7 +158,14 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
       }
     }
 
+
+    lineupQuestion.shuffle(Random());
+
     //print(lineupQuestion);
+    setState(() {
+      _loading = false;
+    });
+
 
     Navigator.pushNamed(context, '/dog-symptoms2');
 
@@ -365,423 +382,448 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
           elevation: 0,
         ),
       ),
-      body: dogSymptomsList.isNotEmpty
-        ? Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-          child: Column(
-            children: [
-            // Container(
-            //   padding: const EdgeInsets.all(15.0),
-            //   decoration: BoxDecoration(
-            //     color: const Color(0xFFCAFFFB),
-            //     borderRadius: BorderRadius.circular(15.0),
-            //   ),
-            //   child: const Text(
-            //     "Select specific symptoms from the dropdown or tap all symptoms your dog might have before proceeding to the next step",
-            //     style: TextStyle(
-            //       color: Color(0xFF344C9E),
-            //       fontFamily: 'Lexend',
-            //       fontWeight: FontWeight.w400,
-            //       fontSize: 15.0,
-            //     ),
-            //   ),
-            // ),
-            // SizedBox(height: 10),
+      body:
+        Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              child: Column(
+                children: [
+                // Container(
+                //   padding: const EdgeInsets.all(15.0),
+                //   decoration: BoxDecoration(
+                //     color: const Color(0xFFCAFFFB),
+                //     borderRadius: BorderRadius.circular(15.0),
+                //   ),
+                //   child: const Text(
+                //     "Select specific symptoms from the dropdown or tap all symptoms your dog might have before proceeding to the next step",
+                //     style: TextStyle(
+                //       color: Color(0xFF344C9E),
+                //       fontFamily: 'Lexend',
+                //       fontWeight: FontWeight.w400,
+                //       fontSize: 15.0,
+                //     ),
+                //   ),
+                // ),
+                // SizedBox(height: 10),
 
-          // Search and Dropdown
+              // Search and Dropdown
 
 
 
 
-              Container(
-            padding: const EdgeInsets.all(15.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
-                  spreadRadius: 1,
-                  blurRadius: 2,
-                  offset: const Offset(0, 1),
+                  Container(
+                padding: const EdgeInsets.all(15.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      spreadRadius: 1,
+                      blurRadius: 2,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Stack(
+                child: Column(
                   children: [
-                    TextField(
-                      controller: _searchController,
-                      onChanged: _filterSymptoms,
-                      style: TextStyle(
-                        color: Color(0xFF1E1E1E),
-                        fontFamily: 'Lexend',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 15.0,
+                    Stack(
+                      children: [
+                        TextField(
+                          controller: _searchController,
+                          onChanged: _filterSymptoms,
+                          style: TextStyle(
+                            color: Color(0xFF1E1E1E),
+                            fontFamily: 'Lexend',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 15.0,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Filter your dog symptoms',
+                            hintStyle: TextStyle(
+                              color: Color(0x881E1E1E),
+                              fontFamily: 'Lexend',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 15.0,
+                            ),
+                            fillColor: Colors.white,
+                            filled: true,
+                            contentPadding: EdgeInsets.fromLTRB(20, 10, 50, 10),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                              borderSide: BorderSide(color: Color(0xFF4A6FD7), width: 2),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                              borderSide: BorderSide(color: Color(0xFF4A6FD7), width: 2),
+                            ),
+                          ),
+                        ),
+
+                        Positioned(
+                          top: 0,
+                          bottom: 0,
+                          right: 15,
+                          child: Icon(
+                            Icons.search,
+                            size: 30,
+                            color: Color(0xFF1DCFC1),
+                          )
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: 130,
+                          child: DropdownButtonFormField<String>(
+                            isDense: true, // reduces height
+                            value: selectedValue,
+                            onChanged: (newValue) {
+                              setState(() {
+                                selectedValue = newValue!;
+                              });
+                              _filterSymptoms(_searchController.text);
+                            },
+                            decoration: InputDecoration(
+                              fillColor: Color(0xFFDBF7FF),
+                              filled: true,
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide(color: Color(0xFFDBF7FF), width: 0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide(color: Color(0xFFDBF7FF), width: 0),
+                              ),
+                            ),
+                            dropdownColor: Colors.white,
+                            style: TextStyle(
+                              color: Color(0xFF4A6FD7),
+                              fontFamily: 'Lexend',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 13.0,
+                            ),
+                            items: options.map((value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value, style: TextStyle(fontSize: 13)),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+
+                        AnimatedOpacity(
+                          opacity: selectedDogSymptomsList.isNotEmpty ? 1.0 : 0.0,
+                          duration: Duration(milliseconds: 200),
+                          child: AnimatedScale(
+                            scale: selectedDogSymptomsList.isNotEmpty ? 1.0 : 0.8,
+                            duration: Duration(milliseconds: 200),
+                            child: selectedDogSymptomsList.isNotEmpty
+                                ? GestureDetector(
+                              onTap: () {
+                                displaySelectedSymptoms();
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFDBF7FF),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Text(
+                                  "Selected",
+                                  style: TextStyle(
+                                    color: Color(0xFF4A6FD7),
+                                    fontFamily: 'Lexend',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 13.0,
+                                  ),
+                                ),
+                              ),
+                            )
+                                : SizedBox.shrink(),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 10),
+
+              Text(
+                'Select all applicable symptoms',
+                style: TextStyle(
+                  color: Color(0xFF344C9E),
+                  fontFamily: 'Lexend',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15.0,
+                ),
+              ),
+              SizedBox(height: 5),
+
+              Text(
+                '(Required to select at least 2 symptoms)',
+                style: TextStyle(
+                    color: Colors.red,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 10
+                ),
+              ),
+
+              SizedBox(height: 10),
+
+
+
+              Flexible(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(5.0),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDBF7FF),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: SingleChildScrollView(
+                    child: filteredSymptoms.isEmpty
+                        ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(
+                          'Nothing matches your search.\nTry a different keyword.',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF4A6FD7),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      decoration: InputDecoration(
-                        hintText: 'Filter your dog symptoms',
-                        hintStyle: TextStyle(
-                          color: Color(0x881E1E1E),
+                    )
+                        : Wrap(
+                      alignment: WrapAlignment.center,
+                      children: filteredSymptoms.map((symptom) {
+                        final symptomName = symptom['name'] ?? '';
+                        final isSelected = selectedDogSymptomsList.contains(symptomName);
+                        return Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (isSelected) {
+                                  selectedDogSymptomsList.remove(symptomName);
+                                } else {
+                                  selectedDogSymptomsList.add(symptomName);
+                                }
+                                print(selectedDogSymptomsList);
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                              decoration: BoxDecoration(
+                                color: isSelected ? const Color(0xFF1DCFC1) : const Color(0xFF4A6FD7),
+                                borderRadius: BorderRadius.circular(5.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 1,
+                                    offset: const Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                symptomName,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ),
+
+
+
+              if (selectedDogSymptomsList.isEmpty && selectedDogSymptomsList.length >= 2)
+                Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: () {
+                        launchUrl(Uri.parse("mailto:support@pawpredict.com?subject=Can't find symptoms&body="));
+                      },
+                      child: const Text(
+                        "Can't find the symptoms?",
+                        style: TextStyle(
+                          color: Color(0xFF344C9E),
                           fontFamily: 'Lexend',
                           fontWeight: FontWeight.w400,
                           fontSize: 15.0,
                         ),
-                        fillColor: Colors.white,
-                        filled: true,
-                        contentPadding: EdgeInsets.fromLTRB(20, 10, 50, 10),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50.0),
-                          borderSide: BorderSide(color: Color(0xFF4A6FD7), width: 2),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50.0),
-                          borderSide: BorderSide(color: Color(0xFF4A6FD7), width: 2),
-                        ),
                       ),
                     ),
-
-                    Positioned(
-                      top: 0,
-                      bottom: 0,
-                      right: 15,
-                      child: Icon(
-                        Icons.search,
-                        size: 30,
-                        color: Color(0xFF1DCFC1),
-                      )
-                    ),
+                    const SizedBox(height: 20),
                   ],
                 ),
-                const SizedBox(height: 10),
 
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: 130,
-                      child: DropdownButtonFormField<String>(
-                        isDense: true, // reduces height
-                        value: selectedValue,
-                        onChanged: (newValue) {
-                          setState(() {
-                            selectedValue = newValue!;
-                          });
-                          _filterSymptoms(_searchController.text);
-                        },
-                        decoration: InputDecoration(
-                          fillColor: Color(0xFFDBF7FF),
-                          filled: true,
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide(color: Color(0xFFDBF7FF), width: 0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide(color: Color(0xFFDBF7FF), width: 0),
-                          ),
-                        ),
-                        dropdownColor: Colors.white,
-                        style: TextStyle(
-                          color: Color(0xFF4A6FD7),
-                          fontFamily: 'Lexend',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 13.0,
-                        ),
-                        items: options.map((value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value, style: TextStyle(fontSize: 13)),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-
-                    AnimatedOpacity(
-                      opacity: selectedDogSymptomsList.isNotEmpty ? 1.0 : 0.0,
-                      duration: Duration(milliseconds: 200),
-                      child: AnimatedScale(
-                        scale: selectedDogSymptomsList.isNotEmpty ? 1.0 : 0.8,
-                        duration: Duration(milliseconds: 200),
-                        child: selectedDogSymptomsList.isNotEmpty
-                            ? GestureDetector(
-                          onTap: () {
-                            displaySelectedSymptoms();
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-                            decoration: BoxDecoration(
-                              color: Color(0xFFDBF7FF),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            child: Text(
-                              "Selected",
-                              style: TextStyle(
-                                color: Color(0xFF4A6FD7),
-                                fontFamily: 'Lexend',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 13.0,
-                              ),
-                            ),
-                          ),
-                        )
-                            : SizedBox.shrink(),
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          SizedBox(height: 10),
-
-          Text(
-            'Select all applicable symptoms',
-            style: TextStyle(
-              color: Color(0xFF344C9E),
-              fontFamily: 'Lexend',
-              fontWeight: FontWeight.w600,
-              fontSize: 15.0,
-            ),
-          ),
-          SizedBox(height: 5),
-
-          Text(
-            '(Required to select at least 2 symptoms)',
-            style: TextStyle(
-                color: Colors.red,
-                fontStyle: FontStyle.italic,
-                fontSize: 10
-            ),
-          ),
-
-          SizedBox(height: 10),
-
-
-
-          Flexible(
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(5.0),
-              decoration: BoxDecoration(
-                color: const Color(0xFFDBF7FF),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: SingleChildScrollView(
-                child: filteredSymptoms.isEmpty
-                    ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Text(
-                      'Nothing matches your search.\nTry a different keyword.',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF4A6FD7),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                )
-                    : Wrap(
-                  alignment: WrapAlignment.center,
-                  children: filteredSymptoms.map((symptom) {
-                    final symptomName = symptom['name'] ?? '';
-                    final isSelected = selectedDogSymptomsList.contains(symptomName);
-                    return Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (isSelected) {
-                              selectedDogSymptomsList.remove(symptomName);
-                            } else {
-                              selectedDogSymptomsList.add(symptomName);
-                            }
-                            print(selectedDogSymptomsList);
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                          decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFF1DCFC1) : const Color(0xFF4A6FD7),
-                            borderRadius: BorderRadius.circular(5.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 1,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            symptomName,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          ),
-
-
-
-          if (selectedDogSymptomsList.isEmpty && selectedDogSymptomsList.length >= 2)
-            Column(
-              children: [
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {
-                    launchUrl(Uri.parse("mailto:support@pawpredict.com?subject=Can't find symptoms&body="));
-                  },
-                  child: const Text(
-                    "Can't find the symptoms?",
-                    style: TextStyle(
-                      color: Color(0xFF344C9E),
-                      fontFamily: 'Lexend',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 15.0,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-
-              AnimatedSwitcher(
-                  duration: Duration(milliseconds: 300),
-                  transitionBuilder: (Widget child, Animation<double> animation) {
-                    return ScaleTransition(scale: animation, child: child);
-                  },
-                  child: (selectedDogSymptomsList.isNotEmpty && selectedDogSymptomsList.length >= 2)
-                      ?Container(
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  AnimatedSwitcher(
+                      duration: Duration(milliseconds: 300),
+                      transitionBuilder: (Widget child, Animation<double> animation) {
+                        return ScaleTransition(scale: animation, child: child);
+                      },
+                      child: (selectedDogSymptomsList.isNotEmpty && selectedDogSymptomsList.length >= 2)
+                          ?Container(
+                        width: double.infinity,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
+                            SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
 
-                            GestureDetector(
-                              onTap: (){
-                                setState(() {
-                                  selectedDogSymptomsList.clear();
-                                });
-                              },
-                              child: Container(
-                                width: 100,
-                                padding: EdgeInsets.symmetric(vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(50),
-                                  border: Border.all(
-                                    width: 3,
-                                    color: Color(0xFF1DCFC1),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      spreadRadius: 2,
-                                      blurRadius: 2,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Cancel',
-                                    style: TextStyle(
-                                      color: Color(0xFF1DCFC1),
-                                      fontFamily: 'Lexend',
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-
-                            GestureDetector(
-                              onTap: (){
-                                getLineupQuestions();
-                              },
-                              child: Container(
-                                width: 100,
-                                padding: EdgeInsets.symmetric(vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: Color(0xFF1DCFC1),
-                                  borderRadius: BorderRadius.circular(50),
-                                  border: Border.all(
-                                    width: 3,
-                                    color: Color(0xFF1DCFC1),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      spreadRadius: 2,
-                                      blurRadius: 2,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Next',
-                                    style: TextStyle(
+                                GestureDetector(
+                                  onTap: (){
+                                    setState(() {
+                                      selectedDogSymptomsList.clear();
+                                    });
+                                  },
+                                  child: Container(
+                                    width: 100,
+                                    padding: EdgeInsets.symmetric(vertical: 5),
+                                    decoration: BoxDecoration(
                                       color: Colors.white,
-                                      fontFamily: 'Lexend',
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 20.0,
+                                      borderRadius: BorderRadius.circular(50),
+                                      border: Border.all(
+                                        width: 3,
+                                        color: Color(0xFF1DCFC1),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          spreadRadius: 2,
+                                          blurRadius: 2,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'Cancel',
+                                        style: TextStyle(
+                                          color: Color(0xFF1DCFC1),
+                                          fontFamily: 'Lexend',
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 20.0,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
 
+
+                                GestureDetector(
+                                  onTap: _canTap
+                                      ? () {
+                                    setState(() {
+                                      _loading = true;
+                                      _canTap = false;
+                                    });
+                                    getLineupQuestions();
+                                    Future.delayed(Duration(seconds: 10), () {
+                                      setState(() {
+                                        _canTap = true;
+                                      });
+                                    });
+                                  }
+                                      : null,
+                                  child: Container(
+                                    width: 100,
+                                    padding: EdgeInsets.symmetric(vertical: 5),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFF1DCFC1),
+                                      borderRadius: BorderRadius.circular(50),
+                                      border: Border.all(
+                                        width: 3,
+                                        color: Color(0xFF1DCFC1),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          spreadRadius: 2,
+                                          blurRadius: 2,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'Next',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Lexend',
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 20.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                              ],
+                            ),
+                            SizedBox(height: 20),
                           ],
                         ),
-                        SizedBox(height: 20),
+                      )
+                          : SizedBox()
+                  ),
                       ],
                     ),
-                  )
-                      : SizedBox()
-              ),
+            ),
+            if (dogSymptomsList.isEmpty || _loading == true)
+              Center(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      color: Colors.white.withOpacity(0.7),
+                    ),
+                    BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 200,
+                            width: 200,
+                            child: lottie.Lottie.asset("assets/animations/loading-running.json"),
+                          ),
+                          SizedBox(
+                            width: 500,
+                            child: lottie.Lottie.asset("assets/animations/loading-text.json"),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
+              ),
+          ],
         )
-          : Center(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 200,
-                width: 200,
-                child: lottie.Lottie.asset("assets/animations/loading-running.json"),
-              ),
-              SizedBox(
-                width: 500,
-                child: lottie.Lottie.asset("assets/animations/loading-text.json"),
-              ),
-            ],
-          ),
-        ),
-      ),
+
     );
   }
 }

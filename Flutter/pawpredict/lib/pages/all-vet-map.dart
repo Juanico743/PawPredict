@@ -219,16 +219,48 @@ class _AllVetClinicState extends State<AllVetClinic> {
   Future<void> _getRoute() async {
     if (currentUserPosition == null) return;
 
-    double shortestDistance = double.infinity;
-    LatLng nearestDestination = locations[0];
+    // Straight-line fallback function
+    LatLng _getNearestByStraightLine() {
+      double minDistance = double.infinity;
+      LatLng nearest = locations[0];
 
-
-    for (LatLng locations in locations) {
-      double distance = await OSRMService.getTravelDistance(currentUserPosition!, locations);
-      if (distance < shortestDistance) {
-        shortestDistance = distance;
-        nearestDestination = locations;
+      for (LatLng loc in locations) {
+        double distance = Geolocator.distanceBetween(
+          currentUserPosition!.latitude,
+          currentUserPosition!.longitude,
+          loc.latitude,
+          loc.longitude,
+        );
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearest = loc;
+        }
       }
+
+      return nearest;
+    }
+
+    Future<LatLng> getNearestByTravelDistance() async {
+      double shortestDistance = double.infinity;
+      LatLng nearest = locations[0];
+
+      for (LatLng loc in locations) {
+        double distance = await OSRMService.getTravelDistance(currentUserPosition!, loc);
+        if (distance < shortestDistance) {
+          shortestDistance = distance;
+          nearest = loc;
+        }
+      }
+
+      return nearest;
+    }
+
+    LatLng nearestDestination;
+    try {
+      nearestDestination = await getNearestByTravelDistance()
+          .timeout(Duration(seconds: 10), onTimeout: () => _getNearestByStraightLine());
+    } catch (e) {
+      nearestDestination = _getNearestByStraightLine();
     }
 
     setState(() {

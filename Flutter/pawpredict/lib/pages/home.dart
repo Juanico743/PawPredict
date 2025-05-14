@@ -231,86 +231,104 @@ class _HomeState extends State<Home> {
                           ),
                         ),
 
-                        GestureDetector(
-                          onTap: (){
-                            Navigator.pushNamed(context, '/dog-information');
-                          },
-                          child: Container(
-                            height: 150,
-                            width: double.infinity,
-                            margin: EdgeInsets.only(top: 0.0, bottom:10.0, left: 0.0, right: 0.0,),
-                            child: Stack(
-                              children: [
-                                Positioned(
-                                  bottom: 4,
-                                  right: 15,
-                                  left: 15,
-                                  child: Container(
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(50.0),
-                                        topLeft: Radius.circular(15.0),
-                                        bottomRight: Radius.circular(15.0),
-                                        bottomLeft: Radius.circular(15.0),
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.2),
-                                          spreadRadius: 2,
-                                          blurRadius: 2,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    padding: EdgeInsets.only(top: 20.0, bottom:20.0, left: 100.0, right: 5.0,),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            'Check Your Dog\'s Symptoms Now',
-                                            style: TextStyle(
-                                              color: Color(0XFF1E1E1E),
-                                              fontFamily:'Lexend',
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 18.0,
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          height: 50,
-                                          width: 50,
-                                          margin: EdgeInsets.only(bottom: 0),
-                                          child: Lottie.asset(
-                                            "assets/animations/forward.json",
-                                            repeat: true,
-                                            fit: BoxFit.contain,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: 10,
-                                  left: 5,
-                                  child: Image(
-                                    image: AssetImage('assets/images/background/dogb1.png'),
-                                    width: 120,
-                                    height: 120,
-                                    fit: BoxFit.fill,
-                                  ),
-                                ),
+                        SizedBox(
+                          height: 50,
+                        ),
 
 
-                              ],
+                        Container(
+                          margin: EdgeInsets.only(top: 0.0, bottom:14.0, left: 15.0, right: 15.0,),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(50.0),
+                              topLeft: Radius.circular(15.0),
+                              bottomRight: Radius.circular(15.0),
+                              bottomLeft: Radius.circular(15.0),
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 2,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Stack(
+                            children: [
+
+                              Positioned(
+                                bottom: 10,
+                                left: 0,
+                                child: Image(
+                                  image: AssetImage('assets/images/background/dogb1.png'),
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+
+                              GestureDetector(
+                                onTap: (){
+                                  Navigator.pushNamed(context, '/dog-information');
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(top: 15.0, bottom:15.0, left: 70.0, right: 15.0,),
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFFDBF7FF),
+                                    border: Border.all(
+                                      width: 3,
+                                      color: Color(0xFF1DCFC1),
+                                    ),
+                                    borderRadius: BorderRadius.circular(100),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        spreadRadius: 2,
+                                        blurRadius: 2,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(width: 20),
+                                      Expanded(
+                                        child: Text(
+                                          'Check Your Dog\'s Symptoms Now',
+                                          style: TextStyle(
+                                            color: Color(0XFF1E1E1E),
+                                            fontFamily:'Lexend',
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 18.0,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        height: 40,
+                                        width: 40,
+                                        margin: EdgeInsets.only(bottom: 0),
+                                        child: Lottie.asset(
+                                          "assets/animations/forward.json",
+                                          repeat: true,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+
+                            ],
                           ),
                         ),
 
                         Container(
-                          margin: EdgeInsets.only(top: 0.0, bottom:14.0, left: 15.0, right: 15.0,),
+                          margin: EdgeInsets.only(top: 0.0, bottom:15.0, left: 15.0, right: 15.0,),
                           width: double.infinity,
                           decoration: BoxDecoration(
                             color: Colors.white,
