@@ -26,6 +26,10 @@ class _FindingsState extends State<Findings> {
   List<String> firstAid = [];
   List<dynamic> specializedVet = [];
 
+  List<dynamic> otherDiseases = [];
+  List<String> otherDiseaseDescription = [];
+  List<bool> otherDiseaseCollapse = List.filled(5, false);
+
   bool loadingComplete = false;
 
   bool otherVet = false;
@@ -66,12 +70,19 @@ class _FindingsState extends State<Findings> {
       );
 
       var response = jsonDecode(res.body);
-      print(res.body);
+      //print(res.body);
 
       if (response["success"] == true) {
         setState(() {
           finalFindings = response["prediction"];
+          otherDiseases = response["otherDiseases"];
+          otherDiseaseDescription = [];
         });
+
+        for (String disease in otherDiseases) {
+          await loadOtherDiseaseDescription(disease);
+        }
+
         loadDescription().then((_) => {
           loadingComplete = true
         });
@@ -82,6 +93,32 @@ class _FindingsState extends State<Findings> {
       print(e);
     }
   }
+
+  Future<void> loadOtherDiseaseDescription(String diseaseName) async {
+    try {
+      String uri = '$serverUri/api/loadOtherDiseaseDescription/';
+
+      var res = await http.post(
+        Uri.parse(uri),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "disease": diseaseName
+        }),
+      );
+
+      var response = jsonDecode(res.body);
+      print(res.body);
+
+      if (response["success"] == true) {
+        setState(() {
+          otherDiseaseDescription.add(response["description"]);
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
 
   Future<void> loadDescription() async {
     try {
@@ -157,6 +194,152 @@ class _FindingsState extends State<Findings> {
         url: contact['website'],
       ),
     ];
+  }
+
+  void endQuestionPopUp() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Center(
+          child: Container(
+            height: 400,
+            margin: EdgeInsets.all(15.0),
+            padding: EdgeInsets.all(15.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(100.0),
+                topLeft: Radius.circular(15.0),
+                bottomRight: Radius.circular(15.0),
+                bottomLeft: Radius.circular(15.0),
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                  width: double.infinity,
+                  child: Text(
+                    'End Process',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      color: Color(0xFF1DCFC1),
+                      fontFamily:'Lexend',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 30.0,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                ),
+
+                Container(
+                  height: 200.0,
+                  width: 200.0,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/exit-dog.png'),
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+
+                Text(
+                  "Exiting will discard any information entered during this session.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFF091F5C),
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(
+                            width: 2,
+                            color: Color(0xFF1DCFC1),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              spreadRadius: 2,
+                              blurRadius: 2,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          'No',
+                          style: TextStyle(
+                            color: Color(0xFF1DCFC1),
+                            fontFamily: 'Lexend',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16.0,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+
+
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.pushNamed(context, '/home');
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Color(0xFF1DCFC1),
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(
+                            width: 2,
+                            color: Color(0xFF1DCFC1),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              spreadRadius: 2,
+                              blurRadius: 2,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          'Yes',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Lexend',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16.0,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+    );
   }
 
 
@@ -321,7 +504,22 @@ class _FindingsState extends State<Findings> {
 
                           SizedBox(height: 10),
 
-                          otherDiseaseList(name: 'Disease 1'),
+                          Column(
+                            children: List.generate(otherDiseases.length, (index) {
+                              return otherDiseaseList(
+                                name: otherDiseases[index],
+                                description: index < otherDiseaseDescription.length
+                                    ? otherDiseaseDescription[index]
+                                    : '',
+                                collapse: otherDiseaseCollapse[index],
+                                onTap: () {
+                                  setState(() {
+                                    otherDiseaseCollapse[index] = !otherDiseaseCollapse[index];
+                                  });
+                                },
+                              );
+                            }),
+                          ),
 
 
 
@@ -647,7 +845,7 @@ class _FindingsState extends State<Findings> {
                                 SizedBox(height: 20),
                                 GestureDetector(
                                   onTap: (){
-                                    Navigator.pushNamed(context, '/home');
+                                    endQuestionPopUp();
                                   },
                                   child: Container(
                                     padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
@@ -668,7 +866,7 @@ class _FindingsState extends State<Findings> {
                                       ],
                                     ),
                                     child: Text(
-                                      'Home',
+                                      'Done',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontFamily: 'Lexend',
@@ -1179,33 +1377,72 @@ class _FindingsState extends State<Findings> {
   }
 
   Widget otherDiseaseList({
-    required String name
+    required String name,
+    required String description,
+    required bool collapse,
+    required VoidCallback onTap,
   }){
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          name,
-          style: TextStyle(
-            color: Color(0xFF4A6FD7),
-            fontFamily: 'Lexend',
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
+        GestureDetector(
+          onTap: onTap,
+          child: Column(
+            children: [
+              SizedBox(height: 10.0),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      name,
+                      style: TextStyle(
+                        color: Color(0xFF4A6FD7),
+                        fontFamily: 'Lexend',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.all(3),
+                      margin: EdgeInsets.only(left: 6),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100.0),
+                        color: Color(0xFFCAFFFB),
+                      ),
+                      child: Center(
+                        child: Transform.rotate(
+                          angle: (collapse) ? 0 : 3.1416,
+                          child: Image.asset(
+                            'assets/images/icons/arrow-map.png',
+                            height: 19,
+                            width: 19,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      )
+                  ),
+                ],
+              ),
+              SizedBox(height: 10.0),
+            ],
           ),
         ),
-        Column(
-          children: [
-            normalText(text: 'sdfsdfsdfsssfdfsdfsfddddddddddddddddddddddddddddddddddddddd'),
-            SizedBox(height: 5  ),
-            Container(
-              height: 1,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color(0xFF1DCFC1),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-            )
-          ],
+        if (collapse)
+
+          Column(
+            children: [
+              normalText(text: description),
+              SizedBox(height: 10.0),
+            ],
+          ),
+        Container(
+          height: .5,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Color(0xFF1DCFC1),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
         ),
       ],
     );

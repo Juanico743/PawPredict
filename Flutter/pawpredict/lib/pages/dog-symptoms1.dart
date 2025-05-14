@@ -22,7 +22,86 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
 
 
   String? selectedValue = 'Common';
-  List<String> options = ['Common', 'All'];
+  List<String> options = [
+    'Common', 'All', 'Gastrointestinal', 'Respiratory', 'Neurological', 'Skin & Coat', 'Behavioral', 'Urinary',
+    'Ocular (Eyes)', 'Auditory (Ears)', 'Oral & Dental', 'Reproductive', 'Musculoskeletal', 'General Symptoms'
+  ];
+  //I added 'Gastrointestinal', 'Respiratory', 'Neurological', 'Skin & Coat', 'Behavioral', 'Urinary', 'Ocular (Eyes)', 'Auditory (Ears)', 'Oral & Dental', 'Reproductive', 'Musculoskeletal', 'General Symptoms'
+  final List<String> _Gastrointestinal = [
+    'Abdominal Pain', 'Bloated Abdomen', 'Bloody Diarrhea', 'Bloody Poop',
+    'Constipation', 'Damage to the Colon', 'Diarrhea', 'Difficulty Bowel Movements',
+    'Difficulty Swallowing', 'Dry Stool', 'Foul Stool', 'Frequent Vomiting', 'Retching',
+    'Straining', 'Watery-yellowish poop', 'Worms in Stool'
+  ];
+
+  final List<String> _Respiratory = [
+    'Bloody Nose', 'Coughing', 'Difficulty Breathing', 'Dry Coughing', 'Gagging',
+    'Grunting Noises', 'Honking Cough', 'Noisy Breathing', 'Nose Discharge',
+    'Rapid Breathing', 'Repeated Snorting Sounds', 'Shortness of Breath', 'Sneezing',
+    'Trouble Breathing'
+  ];
+
+  final List<String> _Neurological = [
+    'Bone Cracking', 'Disorientation', 'Dizziness', 'Dragging Back Legs', 'Drooping Jaw',
+    'Fainting', 'Head Tilting', 'Jerking', 'Loss of Balance', 'Paralysis',
+    'Seizures', 'Twitching', 'Wobbling'
+  ];
+
+  final List<String> _SkinCoat = [
+    'Alopecia', 'Bad Odor', 'Bleeding Skin', 'Bleeding Sores', 'Blisters', 'Bruising',
+    'Crusting', 'Dandruff', 'Darkened Skin', 'Dry Skin', 'Excessive Excitability',
+    'Excessive Licking', 'Greasy Skin', 'Hair Loss', 'Intense Itchiness', 'Lesions',
+    'Multiple Wounds', 'Nail Discharge', 'Poor Coat Condition', 'Scabs'
+  ];
+
+  final List<String> _Behavioral = [
+    'Apprehension', 'Attacking', 'Behavioral Changes', 'Biting Animals', 'Biting Humans',
+    'Biting Objects', 'Biting the Skin', 'Chewing', 'Depression', 'Excessive Irritability',
+    'Excessive Scratching', 'Hypersensitivity', 'Overgrooming', 'Pawing at Face', 'Pawing or Digging',
+    'Restlessness', 'Rubbing', 'Shyness', 'Snapping', 'Startled', 'Whimpering or Yelling'
+  ];
+
+  final List<String> _Urinary = [
+    'Bloody Urine', 'Dark Urine', 'Difficulty Urinating', 'Excessive Urination',
+    'Foul-Smelling Urine', 'Painful Urination'
+  ];
+
+  final List<String> _OcularEyes = [
+    'Blue Eyes', 'Bulging Eye', 'Change in Pupil Size', 'Changes of Eye Color', 'Cloudy Eyes',
+    'Difficulty Seeing', 'Dry Eye', 'Excessive Tear', 'Eye Discharge', 'Eye Redness',
+    'Irritated Bump in the Corner of Eye', 'Irritated Eyes', 'Sensitive to Light', 'Squinting',
+    'Swollen Third Eyelid', 'Tear Staining', 'Thick in the Corner of the Eye', 'Tumors in the Iris',
+    'Yellow Eyes'
+  ];
+
+  final List<String> _AuditoryEars = [
+    'Ear Discharge', 'Ear Inflammation', 'Ear Rubbing', 'Head Shaking'
+  ];
+
+  final List<String> _OralDental = [
+    'Bad Breath', 'Bleeding Gums', 'Dribbling', 'Enlarged Tonsils', 'Excessive Drooling',
+    'Missing Teeth', 'Mouth Ulcers', 'Pale Gums', 'Ulceration'
+  ];
+
+  final List<String> _Reproductive = [
+    'Bloody Nipple Discharge', 'Creamy Discharge in Vulva', 'Resistance to Mating',
+    'Swollen Breasts', 'Vaginal Discharge'
+  ];
+
+  final List<String> _Musculoskeletal = [
+    'Bowlegged Stance', 'Difficulty Sitting', 'Difficulty Standing', 'Difficulty Walking',
+    'Hunched Lower Back', 'Limping', 'Muscle Loss', 'Muscle Spasms', 'Muscle Weakness',
+    'Neck Pain', 'Scuffed Toenails', 'Skipping', 'Stiffness', 'Swollen Joints'
+  ];
+
+  final List<String> _GeneralSymptoms = [
+    'Cold Intolerance', 'Coldness', 'Collapse', 'Consistent Painful', 'Continues Bleeding',
+    'Dehydration', 'Discomfort', 'Excessive Thirst', 'Facial Swelling', 'Fever', 'Increased Appetite',
+    'Inflammation', 'Jaundice', 'Lack of Appetite', 'Lack of Energy', 'Low Body Temperature',
+    'Lumps', 'Painful', 'Painful When Touched', 'Poor Growth', 'Pus', 'Reduced Exercise Tolerance',
+    'Shaking', 'Swelling', 'Swelling Feet', 'Swollen Lymph', 'Weakness', 'Weight Gain', 'Weight Loss',
+    'Yellow Discharge'
+  ];
 
 
   List<Map<String, dynamic>>dogSymptomsList = [];
@@ -65,21 +144,64 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
 
   void _filterSymptoms(String query) {
     setState(() {
+      // Reset the filtered list based on the selected category
       if (query.isEmpty && selectedValue == 'All') {
         filteredSymptoms = List.from(dogSymptomsList);
       } else {
+        // Filter based on the selected category (e.g., _Gastrointestinal, etc.)
         filteredSymptoms = dogSymptomsList.where((symptom) {
           final name = symptom['name']?.toString().toLowerCase() ?? '';
           final isCommon = symptom['common'] ?? false;
 
+          // Handle 'Common' filter
           if (selectedValue == 'Common') {
             return name.contains(query.toLowerCase()) && isCommon;
+          }
+          // Handle filtering for each specific category
+          else if (selectedValue == 'Gastrointestinal') {
+            // Make sure _Gastrointestinal items are matched properly (case-insensitive)
+            return _Gastrointestinal.any((item) => item.toLowerCase() == name) &&
+                name.contains(query.toLowerCase());
+          } else if (selectedValue == 'Respiratory') {
+            return _Respiratory.any((item) => item.toLowerCase() == name) &&
+                name.contains(query.toLowerCase());
+          } else if (selectedValue == 'Neurological') {
+            return _Neurological.any((item) => item.toLowerCase() == name) &&
+                name.contains(query.toLowerCase());
+          } else if (selectedValue == 'Skin & Coat') {
+            return _SkinCoat.any((item) => item.toLowerCase() == name) &&
+                name.contains(query.toLowerCase());
+          }else if (selectedValue == 'Behavioral') {
+            return _Behavioral.any((item) => item.toLowerCase() == name) &&
+                name.contains(query.toLowerCase());
+          } else if (selectedValue == 'Urinary') {
+            return _Urinary.any((item) => item.toLowerCase() == name) &&
+                name.contains(query.toLowerCase());
+          } else if (selectedValue == 'Ocular (Eyes)') {
+            return _OcularEyes.any((item) => item.toLowerCase() == name) &&
+                name.contains(query.toLowerCase());
+          } else if (selectedValue == 'Auditory (Ears)') {
+            return _AuditoryEars.any((item) => item.toLowerCase() == name) &&
+                name.contains(query.toLowerCase());
+          } else if (selectedValue == 'Oral & Dental') {
+            return _OralDental.any((item) => item.toLowerCase() == name) &&
+                name.contains(query.toLowerCase());
+          } else if (selectedValue == 'Reproductive') {
+            return _Reproductive.any((item) => item.toLowerCase() == name) &&
+                name.contains(query.toLowerCase());
+          } else if (selectedValue == 'Musculoskeletal') {
+            return _Musculoskeletal.any((item) => item.toLowerCase() == name) &&
+                name.contains(query.toLowerCase());
+          } else if (selectedValue == 'General Symptoms') {
+            return _GeneralSymptoms.any((item) => item.toLowerCase() == name) &&
+                name.contains(query.toLowerCase());
           } else {
             return name.contains(query.toLowerCase());
           }
         }).toList();
       }
 
+      // Exclude specific symptoms from the filtered list
       filteredSymptoms = filteredSymptoms.where((symptom) {
         final name = symptom['name']?.toString() ?? '';
         return name != 'Lack of Appetite' && name != 'Weakness';
@@ -480,9 +602,9 @@ class _DogSymptoms1State extends State<DogSymptoms1> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         SizedBox(
-                          width: 130,
+                          width: 180,
                           child: DropdownButtonFormField<String>(
-                            isDense: true, // reduces height
+                            isDense: true,
                             value: selectedValue,
                             onChanged: (newValue) {
                               setState(() {
